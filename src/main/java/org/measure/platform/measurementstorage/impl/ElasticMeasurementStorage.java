@@ -37,7 +37,7 @@ public class ElasticMeasurementStorage implements IMeasurementStorage {
 		log.debug("putMeasurement[" + measureInstance + "]: " + measurement.getValues());
 		TransportClient client = connection.getClient();
 		client.prepareIndex("measure", measureInstance).setSource(measurement.getValues()).get();
-		client.prepareIndex("measure", measureInstance + "-last", "last").setSource(measurement.getValues()).get();
+		client.prepareIndex("measure", measureInstance + "-last", "last").setSource(measurement.getValues()).get();			
 	}
 
 	@Override

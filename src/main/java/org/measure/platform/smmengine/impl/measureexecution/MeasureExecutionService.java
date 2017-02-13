@@ -106,6 +106,42 @@ public class MeasureExecutionService implements IMeasureExecutionService {
 	}
 
 	@Override
+	public MeasureLog executeMeasure(Long measureInstanceId) {
+		MeasureInstance measureData = measureInstanceService.findOne(measureInstanceId);
+		MeasureLog log = new MeasureLog();
+
+		log.setExectionDate(new Date());
+		log.setMeasureInstanceName(measureData.getInstanceName());
+		log.setMeasureName(measureData.getMeasureName());
+
+		try {
+
+			if (measureData.isIsRemote()) {
+				List<IMeasurement> measurements = executeRemoteMeasure(measureData, new HashMap<String, String>(), log);
+
+				for (IMeasurement measurement : measurements) {
+					measurementStorage.putMeasurement(measureData.getInstanceName(),
+							measureData.isManageLastMeasurement(), measurement);
+				}
+			} else {
+				IMeasure measureImpl = measureCatalogue.getMeasureImplementation(measureData.getMeasureName());
+				List<IMeasurement> measurements = executeLocalMeasure(measureData, measureImpl, log);
+
+				for (IMeasurement measurement : measurements) {
+					measurementStorage.putMeasurement(measureData.getInstanceName(),
+							measureData.isManageLastMeasurement(), measurement);
+				}
+			}
+
+		} catch (Exception e) {
+
+			log.setExceptionMessage(e.getMessage());
+			log.setSuccess(false);
+		}
+		return log;
+	}
+
+	@Override
 	public MeasureLog testMeasure(Long measureInstanceId) {
 		MeasureInstance measureData = measureInstanceService.findOne(measureInstanceId);
 		MeasureLog log = new MeasureLog();
@@ -149,7 +185,7 @@ public class MeasureExecutionService implements IMeasureExecutionService {
 
 			log.setSuccess(false);
 			log.setExceptionMessage(e.getMessage());
-			System.out.println("Log1 " +log.getExceptionMessage());
+			System.out.println("Log1 " + log.getExceptionMessage());
 			e.printStackTrace();
 		}
 

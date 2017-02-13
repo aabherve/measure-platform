@@ -62,6 +62,10 @@
 		        }
 			},
 			'testMeasure' : {
+				url : 'api/measure-instance/sheduling/test',
+				method : 'GET'
+			},
+			'executeMeasure' : {
 				url : 'api/measure-instance/sheduling/execute',
 				method : 'GET'
 			}

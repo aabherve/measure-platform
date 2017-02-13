@@ -150,7 +150,8 @@
                     resolve: {
                         entity: ['MeasureInstance', function(MeasureInstance) {
                             return MeasureInstance.get({id : $stateParams.instanceId}).$promise;
-                        }]
+                        }],
+                        isTest : true
                     }
                 }).result.then(function() {
                     $state.go('projectinstances', null, { reload: 'projectinstances' });
@@ -158,7 +159,31 @@
                     $state.go('^');
                 });
             }]
-        })
-        ;
+        }) .state('projectinstances.execute', {
+            parent: 'projectinstances',
+            url: '/{instanceId}/execute',
+            data: {
+                authorities: ['ROLE_USER']
+            },
+            onEnter: ['$stateParams', '$state', '$uibModal', function($stateParams, $state, $uibModal) {
+                $uibModal.open({
+                    templateUrl: 'app/pages/project/instances/instance-test-dialog.html',
+                    controller: 'TestInstanceDialogController',
+                    controllerAs: 'vm',
+                    backdrop: 'static',
+                    size: 'lg',
+                    resolve: {
+                        entity: ['MeasureInstance', function(MeasureInstance) {
+                            return MeasureInstance.get({id : $stateParams.instanceId}).$promise;
+                        }],
+                        isTest : false
+                    }
+                }).result.then(function() {
+                    $state.go('projectinstances', null, { reload: 'projectinstances' });
+                }, function() {
+                    $state.go('^');
+                });
+            }]
+        });
     }
 })();

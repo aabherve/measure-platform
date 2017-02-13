@@ -6,6 +6,7 @@ import javax.inject.Inject;
 
 import org.measure.platform.core.api.entitys.MeasureInstanceService;
 import org.measure.platform.core.entity.MeasureInstance;
+import org.measure.platform.smmengine.api.ILoggerService;
 import org.measure.platform.smmengine.api.IMeasureExecutionService;
 import org.measure.platform.smmengine.api.IShedulingService;
 import org.measure.smm.log.MeasureLog;
@@ -31,6 +32,9 @@ public class MeasureExecutionResource {
 
 	@Inject
 	private MeasureInstanceService instanceService;
+	
+	@Inject
+	private ILoggerService logger;
 
 	@RequestMapping(value = "/start", method = RequestMethod.GET)
 	public Boolean startMeasureSheduling(@RequestParam("id") String id) {
@@ -66,13 +70,25 @@ public class MeasureExecutionResource {
 	}
 
 	@Timed
+	@RequestMapping(value = "/test", method = RequestMethod.GET)
+	public ResponseEntity<MeasureLog> testMeasure(@RequestParam("id") String id) {
+		if (id.matches("\\d+")) {
+			Long instanceId = Long.valueOf(id);
+			MeasureLog measurement = measureExecutionService.testMeasure(instanceId);
+			return Optional.ofNullable(measurement).map(result -> new ResponseEntity<>(result, HttpStatus.OK))
+					.orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
+		}
+		return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+	}
+	
+	
+	@Timed
 	@RequestMapping(value = "/execute", method = RequestMethod.GET)
 	public ResponseEntity<MeasureLog> executeMeasure(@RequestParam("id") String id) {
 		if (id.matches("\\d+")) {
 			Long instanceId = Long.valueOf(id);
-			MeasureLog measurement = measureExecutionService.testMeasure(instanceId);
-			System.out.println(measurement.isSuccess());
-			System.out.println(measurement.getExceptionMessage());
+			MeasureLog measurement = measureExecutionService.executeMeasure(instanceId);
+			logger.addMeasureExecutionLog(measurement);
 			return Optional.ofNullable(measurement).map(result -> new ResponseEntity<>(result, HttpStatus.OK))
 					.orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
 		}

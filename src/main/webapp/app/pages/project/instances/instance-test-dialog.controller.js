@@ -5,21 +5,34 @@
 			'TestInstanceDialogController', TestInstanceDialogController);
 
 	TestInstanceDialogController.$inject = [ '$timeout', '$scope',
-			'$stateParams', '$uibModalInstance', 'entity','ProjectInstances'];
+			'$stateParams', '$uibModalInstance', 'entity','ProjectInstances','isTest'];
 
 	function TestInstanceDialogController($timeout, $scope, $stateParams,
-			$uibModalInstance, entity,ProjectInstances) {
+			$uibModalInstance, entity,ProjectInstances,isTest) {
 		var vm = this;
 
 		vm.close = close;
 		
 		vm.measureInstance = entity;
 
-		testMeasure(vm.measureInstance.id);
+		if(isTest){
+			testMeasure(vm.measureInstance.id);
+		}else {
+			executeMeasure(vm.measureInstance.id);
+		}
+
 		vm.testResult = null;
 
 		function testMeasure(id) {
 			ProjectInstances.testMeasure({
+				id : id
+			}, function(result) {
+				vm.testResult = result;
+			});
+		}
+		
+		function executeMeasure(id) {
+			ProjectInstances.executeMeasure({
 				id : id
 			}, function(result) {
 				vm.testResult = result;

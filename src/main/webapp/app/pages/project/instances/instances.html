@@ -76,13 +76,11 @@
 						</dl>
 					</td>
 					<td style="vertical-align: top;">
-						<h4 style="margin-top: 0px;"
-							ng-show="!instance.isRemote">
+						<h4 style="margin-top: 0px;" ng-show="!instance.isRemote">
 							<span class="label label-primary" style="height: 50px;">Measure
 								Platform</span>
 						</h4>
-						<h4 style="margin-top: 0px;"
-							ng-show="instance.isRemote">
+						<h4 style="margin-top: 0px;" ng-show="instance.isRemote">
 							<span class="label label-warning">{{instance.remoteLabel}}</span>
 							<span class="label label-warning">{{instance.remoteAdress}}</span>
 						</h4>
@@ -102,7 +100,13 @@
 							<button type="submit"
 								ui-sref="projectinstances.test({instanceId:instance.id})"
 								class="btn btn-primary btn-sm">
-								<span class="glyphicon glyphicon glyphicon-play"></span> <span
+								<span class="glyphicon glyphicon-flash"></span> <span
+									class="hidden-xs hidden-sm"></span>
+							</button>
+							<button type="submit"
+								ui-sref="projectinstances.execute({instanceId:instance.id})"
+								class="btn btn-primary btn-sm">
+								<span class="glyphicon glyphicon-play"></span> <span
 									class="hidden-xs hidden-sm"></span>
 							</button>
 							<button type="submit"
