@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="fr"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>JSR310PersistenceConverters.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Measure Platform</a> &gt; <a href="index.source.html" class="el_package">org.measure.platform.framework.domain.util</a> &gt; <span class="el_source">JSR310PersistenceConverters.java</span></div><h1>JSR310PersistenceConverters.java</h1><pre class="source lang-java linenums">package org.measure.platform.framework.domain.util;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
+import java.util.Date;
+
+import javax.persistence.AttributeConverter;
+import javax.persistence.Converter;
+
+import org.measure.platform.framework.domain.util.JSR310DateConverters.DateToLocalDateTimeConverter;
+import org.measure.platform.framework.domain.util.JSR310DateConverters.DateToZonedDateTimeConverter;
+import org.measure.platform.framework.domain.util.JSR310DateConverters.LocalDateTimeToDateConverter;
+import org.measure.platform.framework.domain.util.JSR310DateConverters.ZonedDateTimeToDateConverter;
+
+public final class JSR310PersistenceConverters {
+
+<span class="nc" id="L18">    private JSR310PersistenceConverters() {}</span>
+
+    @Converter(autoApply = true)
+<span class="fc" id="L21">    public static class LocalDateConverter implements AttributeConverter&lt;LocalDate, java.sql.Date&gt; {</span>
+
+        @Override
+        public java.sql.Date convertToDatabaseColumn(LocalDate date) {
+<span class="nc bnc" id="L25" title="All 2 branches missed.">            return date == null ? null : java.sql.Date.valueOf(date);</span>
+        }
+
+        @Override
+        public LocalDate convertToEntityAttribute(java.sql.Date date) {
+<span class="nc bnc" id="L30" title="All 2 branches missed.">            return date == null ? null : date.toLocalDate();</span>
+        }
+    }
+
+    @Converter(autoApply = true)
+<span class="fc" id="L35">    public static class ZonedDateTimeConverter implements AttributeConverter&lt;ZonedDateTime, Date&gt; {</span>
+
+        @Override
+        public Date convertToDatabaseColumn(ZonedDateTime zonedDateTime) {
+<span class="nc" id="L39">            return ZonedDateTimeToDateConverter.INSTANCE.convert(zonedDateTime);</span>
+        }
+
+        @Override
+        public ZonedDateTime convertToEntityAttribute(Date date) {
+<span class="nc" id="L44">            return DateToZonedDateTimeConverter.INSTANCE.convert(date);</span>
+        }
+    }
+
+    @Converter(autoApply = true)
+<span class="fc" id="L49">    public static class LocalDateTimeConverter implements AttributeConverter&lt;LocalDateTime, Date&gt; {</span>
+
+        @Override
+        public Date convertToDatabaseColumn(LocalDateTime localDateTime) {
+<span class="nc" id="L53">            return LocalDateTimeToDateConverter.INSTANCE.convert(localDateTime);</span>
+        }
+
+        @Override
+        public LocalDateTime convertToEntityAttribute(Date date) {
+<span class="nc" id="L58">            return DateToLocalDateTimeConverter.INSTANCE.convert(date);</span>
+        }
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.7.201606060606</span></div></body></html>

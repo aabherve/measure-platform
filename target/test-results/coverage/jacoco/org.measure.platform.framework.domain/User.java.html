@@ -1,0 +1,245 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="fr"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>User.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Measure Platform</a> &gt; <a href="index.source.html" class="el_package">org.measure.platform.framework.domain</a> &gt; <span class="el_source">User.java</span></div><h1>User.java</h1><pre class="source lang-java linenums">package org.measure.platform.framework.domain;
+
+import java.io.Serializable;
+import java.time.ZonedDateTime;
+import java.util.HashSet;
+import java.util.Locale;
+import java.util.Set;
+
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Size;
+
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.hibernate.validator.constraints.Email;
+import org.measure.platform.framework.config.Constants;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+/**
+ * A user.
+ */
+@Entity
+@Table(name = &quot;jhi_user&quot;)
+@Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
+<span class="nc" id="L37">public class User extends AbstractAuditingEntity implements Serializable {</span>
+
+    private static final long serialVersionUID = 1L;
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long id;
+
+    @NotNull
+    @Pattern(regexp = Constants.LOGIN_REGEX)
+    @Size(min = 1, max = 50)
+    @Column(length = 50, unique = true, nullable = false)
+    private String login;
+
+    @JsonIgnore
+    @NotNull
+    @Size(min = 60, max = 60)
+    @Column(name = &quot;password_hash&quot;,length = 60)
+    private String password;
+
+    @Size(max = 50)
+    @Column(name = &quot;first_name&quot;, length = 50)
+    private String firstName;
+
+    @Size(max = 50)
+    @Column(name = &quot;last_name&quot;, length = 50)
+    private String lastName;
+
+    @Email
+    @Size(max = 100)
+    @Column(length = 100, unique = true)
+    private String email;
+
+<span class="nc" id="L70">    @NotNull</span>
+    @Column(nullable = false)
+    private boolean activated = false;
+
+    @Size(min = 2, max = 5)
+    @Column(name = &quot;lang_key&quot;, length = 5)
+    private String langKey;
+
+    @Size(max = 20)
+    @Column(name = &quot;activation_key&quot;, length = 20)
+    @JsonIgnore
+    private String activationKey;
+
+    @Size(max = 20)
+    @Column(name = &quot;reset_key&quot;, length = 20)
+    private String resetKey;
+
+<span class="nc" id="L87">    @Column(name = &quot;reset_date&quot;, nullable = true)</span>
+    private ZonedDateTime resetDate = null;
+
+<span class="nc" id="L90">    @JsonIgnore</span>
+    @ManyToMany
+    @JoinTable(
+        name = &quot;jhi_user_authority&quot;,
+        joinColumns = {@JoinColumn(name = &quot;user_id&quot;, referencedColumnName = &quot;id&quot;)},
+        inverseJoinColumns = {@JoinColumn(name = &quot;authority_name&quot;, referencedColumnName = &quot;name&quot;)})
+    @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
+    private Set&lt;Authority&gt; authorities = new HashSet&lt;&gt;();
+
+<span class="nc" id="L99">    @JsonIgnore</span>
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = &quot;user&quot;)
+    @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
+    private Set&lt;PersistentToken&gt; persistentTokens = new HashSet&lt;&gt;();
+
+    public Long getId() {
+<span class="nc" id="L105">        return id;</span>
+    }
+
+    public void setId(Long id) {
+<span class="nc" id="L109">        this.id = id;</span>
+<span class="nc" id="L110">    }</span>
+
+    public String getLogin() {
+<span class="nc" id="L113">        return login;</span>
+    }
+
+    //Lowercase the login before saving it in database
+    public void setLogin(String login) {
+<span class="nc" id="L118">        this.login = login.toLowerCase(Locale.ENGLISH);</span>
+<span class="nc" id="L119">    }</span>
+
+    public String getPassword() {
+<span class="nc" id="L122">        return password;</span>
+    }
+
+    public void setPassword(String password) {
+<span class="nc" id="L126">        this.password = password;</span>
+<span class="nc" id="L127">    }</span>
+
+    public String getFirstName() {
+<span class="nc" id="L130">        return firstName;</span>
+    }
+
+    public void setFirstName(String firstName) {
+<span class="nc" id="L134">        this.firstName = firstName;</span>
+<span class="nc" id="L135">    }</span>
+
+    public String getLastName() {
+<span class="nc" id="L138">        return lastName;</span>
+    }
+
+    public void setLastName(String lastName) {
+<span class="nc" id="L142">        this.lastName = lastName;</span>
+<span class="nc" id="L143">    }</span>
+
+    public String getEmail() {
+<span class="nc" id="L146">        return email;</span>
+    }
+
+    public void setEmail(String email) {
+<span class="nc" id="L150">        this.email = email;</span>
+<span class="nc" id="L151">    }</span>
+
+    public boolean getActivated() {
+<span class="nc" id="L154">        return activated;</span>
+    }
+
+    public void setActivated(boolean activated) {
+<span class="nc" id="L158">        this.activated = activated;</span>
+<span class="nc" id="L159">    }</span>
+
+    public String getActivationKey() {
+<span class="nc" id="L162">        return activationKey;</span>
+    }
+
+    public void setActivationKey(String activationKey) {
+<span class="nc" id="L166">        this.activationKey = activationKey;</span>
+<span class="nc" id="L167">    }</span>
+
+    public String getResetKey() {
+<span class="nc" id="L170">        return resetKey;</span>
+    }
+
+    public void setResetKey(String resetKey) {
+<span class="nc" id="L174">        this.resetKey = resetKey;</span>
+<span class="nc" id="L175">    }</span>
+
+    public ZonedDateTime getResetDate() {
+<span class="nc" id="L178">       return resetDate;</span>
+    }
+
+    public void setResetDate(ZonedDateTime resetDate) {
+<span class="nc" id="L182">       this.resetDate = resetDate;</span>
+<span class="nc" id="L183">    }</span>
+
+    public String getLangKey() {
+<span class="nc" id="L186">        return langKey;</span>
+    }
+
+    public void setLangKey(String langKey) {
+<span class="nc" id="L190">        this.langKey = langKey;</span>
+<span class="nc" id="L191">    }</span>
+
+    public Set&lt;Authority&gt; getAuthorities() {
+<span class="nc" id="L194">        return authorities;</span>
+    }
+
+    public void setAuthorities(Set&lt;Authority&gt; authorities) {
+<span class="nc" id="L198">        this.authorities = authorities;</span>
+<span class="nc" id="L199">    }</span>
+
+    public Set&lt;PersistentToken&gt; getPersistentTokens() {
+<span class="nc" id="L202">        return persistentTokens;</span>
+    }
+
+    public void setPersistentTokens(Set&lt;PersistentToken&gt; persistentTokens) {
+<span class="nc" id="L206">        this.persistentTokens = persistentTokens;</span>
+<span class="nc" id="L207">    }</span>
+
+    @Override
+    public boolean equals(Object o) {
+<span class="nc bnc" id="L211" title="All 2 branches missed.">        if (this == o) {</span>
+<span class="nc" id="L212">            return true;</span>
+        }
+<span class="nc bnc" id="L214" title="All 4 branches missed.">        if (o == null || getClass() != o.getClass()) {</span>
+<span class="nc" id="L215">            return false;</span>
+        }
+
+<span class="nc" id="L218">        User user = (User) o;</span>
+
+<span class="nc bnc" id="L220" title="All 2 branches missed.">        if (!login.equals(user.login)) {</span>
+<span class="nc" id="L221">            return false;</span>
+        }
+
+<span class="nc" id="L224">        return true;</span>
+    }
+
+    @Override
+    public int hashCode() {
+<span class="nc" id="L229">        return login.hashCode();</span>
+    }
+
+    @Override
+    public String toString() {
+<span class="nc" id="L234">        return &quot;User{&quot; +</span>
+            &quot;login='&quot; + login + '\'' +
+            &quot;, firstName='&quot; + firstName + '\'' +
+            &quot;, lastName='&quot; + lastName + '\'' +
+            &quot;, email='&quot; + email + '\'' +
+            &quot;, activated='&quot; + activated + '\'' +
+            &quot;, langKey='&quot; + langKey + '\'' +
+            &quot;, activationKey='&quot; + activationKey + '\'' +
+            &quot;}&quot;;
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.7.201606060606</span></div></body></html>

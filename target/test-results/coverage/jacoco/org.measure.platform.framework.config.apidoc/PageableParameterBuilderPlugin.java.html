@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="fr"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>PageableParameterBuilderPlugin.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Measure Platform</a> &gt; <a href="index.source.html" class="el_package">org.measure.platform.framework.config.apidoc</a> &gt; <span class="el_source">PageableParameterBuilderPlugin.java</span></div><h1>PageableParameterBuilderPlugin.java</h1><pre class="source lang-java linenums">package org.measure.platform.framework.config.apidoc;
+
+import static com.google.common.collect.Lists.newArrayList;
+import static springfox.documentation.schema.ResolvedTypes.modelRefFactory;
+import static springfox.documentation.spi.schema.contexts.ModelContext.inputParam;
+
+import java.util.List;
+
+import org.measure.platform.framework.config.Constants;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Profile;
+import org.springframework.core.MethodParameter;
+import org.springframework.core.annotation.Order;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Component;
+
+import com.fasterxml.classmate.ResolvedType;
+import com.fasterxml.classmate.TypeResolver;
+import com.google.common.base.Function;
+
+import springfox.documentation.schema.ModelReference;
+import springfox.documentation.schema.TypeNameExtractor;
+import springfox.documentation.service.Parameter;
+import springfox.documentation.spi.DocumentationType;
+import springfox.documentation.spi.schema.contexts.ModelContext;
+import springfox.documentation.spi.service.ParameterBuilderPlugin;
+import springfox.documentation.spi.service.contexts.ParameterContext;
+import springfox.documentation.swagger.common.SwaggerPluginSupport;
+
+@Component
+@Order(SwaggerPluginSupport.SWAGGER_PLUGIN_ORDER)
+@Profile(Constants.SPRING_PROFILE_SWAGGER)
+public class PageableParameterBuilderPlugin implements ParameterBuilderPlugin {
+    private final TypeNameExtractor nameExtractor;
+    private final TypeResolver resolver;
+
+    @Autowired
+<span class="nc" id="L38">    public PageableParameterBuilderPlugin(TypeNameExtractor nameExtractor, TypeResolver resolver) {</span>
+<span class="nc" id="L39">        this.nameExtractor = nameExtractor;</span>
+<span class="nc" id="L40">        this.resolver = resolver;</span>
+<span class="nc" id="L41">    }</span>
+
+    @Override
+    public boolean supports(DocumentationType delimiter) {
+<span class="nc" id="L45">        return true;</span>
+    }
+
+    private Function&lt;ResolvedType, ? extends ModelReference&gt;
+    createModelRefFactory(ParameterContext context) {
+<span class="nc" id="L50">        ModelContext modelContext = inputParam(context.methodParameter().getParameterType(),</span>
+<span class="nc" id="L51">            context.getDocumentationType(),</span>
+<span class="nc" id="L52">            context.getAlternateTypeProvider(),</span>
+<span class="nc" id="L53">            context.getGenericNamingStrategy(),</span>
+<span class="nc" id="L54">            context.getIgnorableParameterTypes());</span>
+<span class="nc" id="L55">        return modelRefFactory(modelContext, nameExtractor);</span>
+    }
+
+    @Override
+    public void apply(ParameterContext context) {
+<span class="nc" id="L60">        MethodParameter parameter = context.methodParameter();</span>
+<span class="nc" id="L61">        Class&lt;?&gt; type = parameter.getParameterType();</span>
+<span class="nc bnc" id="L62" title="All 4 branches missed.">        if (type != null &amp;&amp; Pageable.class.isAssignableFrom(type)) {</span>
+<span class="nc" id="L63">            Function&lt;ResolvedType, ? extends ModelReference&gt; factory =</span>
+<span class="nc" id="L64">                createModelRefFactory(context);</span>
+
+<span class="nc" id="L66">            ModelReference intModel = factory.apply(resolver.resolve(Integer.TYPE));</span>
+<span class="nc" id="L67">            ModelReference stringModel = factory.apply(resolver.resolve(List.class, String.class));</span>
+
+<span class="nc" id="L69">            List&lt;Parameter&gt; parameters = newArrayList(</span>
+<span class="nc" id="L70">                context.parameterBuilder()</span>
+<span class="nc" id="L71">                    .parameterType(&quot;query&quot;).name(&quot;page&quot;).modelRef(intModel)</span>
+<span class="nc" id="L72">                    .description(&quot;Page number of the requested page&quot;)</span>
+<span class="nc" id="L73">                    .build(),</span>
+<span class="nc" id="L74">                context.parameterBuilder()</span>
+<span class="nc" id="L75">                    .parameterType(&quot;query&quot;).name(&quot;size&quot;).modelRef(intModel)</span>
+<span class="nc" id="L76">                    .description(&quot;Size of a page&quot;)</span>
+<span class="nc" id="L77">                    .build(),</span>
+<span class="nc" id="L78">                context.parameterBuilder()</span>
+<span class="nc" id="L79">                    .parameterType(&quot;query&quot;).name(&quot;sort&quot;).modelRef(stringModel).allowMultiple(true)</span>
+<span class="nc" id="L80">                    .description(&quot;Sorting criteria in the format: property(,asc|desc). &quot;</span>
+                        + &quot;Default sort order is ascending. &quot;
+                        + &quot;Multiple sort criteria are supported.&quot;)
+<span class="nc" id="L83">                    .build());</span>
+
+<span class="nc" id="L85">            context.getOperationContext().operationBuilder().parameters(parameters);</span>
+        }
+<span class="nc" id="L87">    }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.7.201606060606</span></div></body></html>

@@ -1,0 +1,217 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="fr"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MeasureViewServiceImpl.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Measure Platform</a> &gt; <a href="index.source.html" class="el_package">org.measure.platform.core.impl.entitys</a> &gt; <span class="el_source">MeasureViewServiceImpl.java</span></div><h1>MeasureViewServiceImpl.java</h1><pre class="source lang-java linenums">package org.measure.platform.core.impl.entitys;
+
+import java.util.List;
+import java.util.Locale;
+
+import javax.inject.Inject;
+
+import org.measure.platform.core.api.entitys.DashboardService;
+import org.measure.platform.core.api.entitys.MeasureViewService;
+import org.measure.platform.core.api.entitys.PhaseService;
+import org.measure.platform.core.api.entitys.ProjectService;
+import org.measure.platform.core.entity.Dashboard;
+import org.measure.platform.core.entity.MeasureView;
+import org.measure.platform.core.entity.Phase;
+import org.measure.platform.core.entity.Project;
+import org.measure.platform.core.impl.repository.MeasureViewRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cglib.core.Local;
+import org.springframework.context.MessageSource;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+/**
+ * Service Implementation for managing MeasureView.
+ */
+@Service
+@Transactional
+<span class="nc" id="L30">public class MeasureViewServiceImpl implements MeasureViewService{</span>
+
+<span class="nc" id="L32">    private final Logger log = LoggerFactory.getLogger(MeasureViewServiceImpl.class);</span>
+    
+    @Inject
+    private MeasureViewRepository measureViewRepository;
+    
+    @Inject
+    private ProjectService projectService;
+    
+    @Inject
+    private PhaseService phaseService;
+    
+    @Inject
+    private DashboardService dashboardService;
+    
+    
+
+    @Autowired
+    private MessageSource messageSource;
+    
+
+    /**
+     * Save a measureView.
+     *
+     * @param measureView the entity to save
+     * @return the persisted entity
+     */
+    public MeasureView save(MeasureView measureView) {
+<span class="nc" id="L59">        log.debug(&quot;Request to save MeasureView : {}&quot;, measureView);</span>
+        
+<span class="nc bnc" id="L61" title="All 2 branches missed.">        if(!measureView.isCustom()){   	</span>
+<span class="nc" id="L62">        	updateViewData(measureView);</span>
+        }
+             
+<span class="nc" id="L65">        MeasureView result = measureViewRepository.save(measureView);</span>
+<span class="nc" id="L66">        return result;</span>
+    }
+
+	private void updateViewData(MeasureView measureView) {
+	
+<span class="nc" id="L71">		String type = &quot;line&quot;;</span>
+		
+<span class="nc bnc" id="L73" title="All 2 branches missed.">		if(measureView.getType().equals(&quot;Last Value&quot;)){</span>
+
+<span class="nc bnc" id="L75" title="All 2 branches missed.">			String refresh = measureView.isAuto() ? &quot;t&quot;:&quot;f&quot;;</span>
+<span class="nc" id="L76">			String periode = &quot;from:now-1y,mode:quick,to:now&quot;;</span>
+<span class="nc" id="L77">			String measure = measureView.getMeasureinstance().getInstanceName().replaceAll(&quot; &quot;, &quot;+&quot;);</span>
+			
+<span class="nc" id="L79">			String width = &quot;300&quot;;</span>
+<span class="nc" id="L80">			String height = &quot;300&quot;;</span>
+<span class="nc" id="L81">			String font = &quot;50&quot;;</span>
+<span class="nc bnc" id="L82" title="All 2 branches missed.">			if(measureView.getSize().equals(&quot;Small&quot;)){</span>
+<span class="nc" id="L83">				font = &quot;20&quot;;</span>
+<span class="nc bnc" id="L84" title="All 2 branches missed.">			} else if(measureView.getSize().equals(&quot;Medium&quot;)){</span>
+<span class="nc" id="L85">				font = &quot;50&quot;;</span>
+<span class="nc bnc" id="L86" title="All 2 branches missed.">			} else if(measureView.getSize().equals(&quot;Large&quot;)){</span>
+<span class="nc" id="L87">				font = &quot;80&quot;;</span>
+<span class="nc bnc" id="L88" title="All 2 branches missed.">			} else if(measureView.getSize().equals(&quot;Very Large&quot;)){</span>
+<span class="nc" id="L89">				font = &quot;120&quot;;</span>
+			}
+			
+<span class="nc" id="L92">			String value =   messageSource.getMessage(&quot;viewtype.view2&quot;, new Object[]{&quot;metric&quot;,refresh,periode,measure,font,height,width}, Locale.ENGLISH);    	</span>
+<span class="nc" id="L93">			measureView.setViewData(value);		</span>
+<span class="nc" id="L94">		}else{</span>
+<span class="nc bnc" id="L95" title="All 2 branches missed.">			if(measureView.getType().equals(&quot;Line chart&quot;)){</span>
+<span class="nc" id="L96">				type = &quot;line&quot;;</span>
+<span class="nc bnc" id="L97" title="All 2 branches missed.">			}else if(measureView.getType().equals(&quot;Area chart&quot;)){</span>
+<span class="nc" id="L98">				type = &quot;area&quot;;</span>
+<span class="nc bnc" id="L99" title="All 2 branches missed.">			}else if(measureView.getType().equals(&quot;Bar chart&quot;)){</span>
+<span class="nc" id="L100">				type = &quot;histogram&quot;;</span>
+			}
+			
+<span class="nc bnc" id="L103" title="All 2 branches missed.">			String refresh = measureView.isAuto() ? &quot;t&quot;:&quot;f&quot;;</span>
+			
+<span class="nc" id="L105">			String periode = &quot;from:now-24h,mode:quick,to:now&quot;;</span>
+<span class="nc" id="L106">			String interval = &quot;30s&quot;;</span>
+<span class="nc bnc" id="L107" title="All 2 branches missed.">			if(measureView.getInterval().equals(&quot;Last 15 minutes&quot;)){</span>
+<span class="nc" id="L108">				periode = &quot;from:now-15m,mode:quick,to:now&quot;;</span>
+<span class="nc" id="L109">				interval = &quot;5s&quot;;</span>
+<span class="nc bnc" id="L110" title="All 2 branches missed.">			}else if(measureView.getInterval().equals(&quot;Last Hour&quot;)){</span>
+<span class="nc" id="L111">				periode = &quot;from:now-1h,mode:quick,to:now&quot;;</span>
+<span class="nc" id="L112">				interval = &quot;30s&quot;;</span>
+<span class="nc bnc" id="L113" title="All 2 branches missed.">			} else if(measureView.getInterval().equals(&quot;Last Day&quot;)){</span>
+<span class="nc" id="L114">				periode = &quot;from:now-24h,mode:quick,to:now&quot;;</span>
+<span class="nc" id="L115">				interval=&quot;10m&quot;;</span>
+<span class="nc bnc" id="L116" title="All 2 branches missed.">			} else if(measureView.getInterval().equals(&quot;Last Week&quot;)){</span>
+<span class="nc" id="L117">				periode = &quot;rom:now-7d,mode:quick,to:now&quot;;</span>
+<span class="nc" id="L118">				interval = &quot;1h&quot;;</span>
+<span class="nc bnc" id="L119" title="All 2 branches missed.">			} else if(measureView.getInterval().equals(&quot;Last Month&quot;)){</span>
+<span class="nc" id="L120">				periode = &quot;from:now-30d,mode:quick,to:now&quot;;</span>
+<span class="nc" id="L121">				interval = &quot;3h&quot;;</span>
+<span class="nc bnc" id="L122" title="All 2 branches missed.">			} else if(measureView.getInterval().equals(&quot;Last Year&quot;)){</span>
+<span class="nc" id="L123">				periode = &quot;from:now-1y,mode:quick,to:now&quot;;</span>
+<span class="nc" id="L124">				interval = &quot;1d&quot;;</span>
+			} 
+<span class="nc" id="L126">			String measure = measureView.getMeasureinstance().getInstanceName().replaceAll(&quot; &quot;, &quot;+&quot;);</span>
+			
+<span class="nc" id="L128">			String color = &quot;%235195CE&quot;;</span>
+			
+<span class="nc" id="L130">			String width = &quot;800&quot;;</span>
+<span class="nc" id="L131">			String height = &quot;400&quot;;</span>
+<span class="nc bnc" id="L132" title="All 2 branches missed.">			if(measureView.getSize().equals(&quot;Small&quot;)){</span>
+<span class="nc" id="L133">				width = &quot;400&quot;;</span>
+<span class="nc" id="L134">				height = &quot;300&quot;;</span>
+<span class="nc bnc" id="L135" title="All 2 branches missed.">			} else if(measureView.getSize().equals(&quot;Medium&quot;)){</span>
+<span class="nc" id="L136">				width = &quot;800&quot;;</span>
+<span class="nc" id="L137">				height = &quot;400&quot;;</span>
+<span class="nc bnc" id="L138" title="All 2 branches missed.">			} else if(measureView.getSize().equals(&quot;Large&quot;)){</span>
+<span class="nc" id="L139">				width = &quot;1200&quot;;</span>
+<span class="nc" id="L140">				height = &quot;600&quot;;</span>
+<span class="nc bnc" id="L141" title="All 2 branches missed.">			} else if(measureView.getSize().equals(&quot;Very Large&quot;)){</span>
+<span class="nc" id="L142">				width = &quot;1800&quot;;</span>
+<span class="nc" id="L143">				height = &quot;800&quot;;</span>
+			}
+			
+<span class="nc" id="L146">			String value =   messageSource.getMessage(&quot;viewtype.view1&quot;, new Object[]{type,refresh,periode,measure,color,interval,height,width}, Locale.ENGLISH);    	</span>
+<span class="nc" id="L147">			measureView.setViewData(value);		</span>
+		}
+		
+		
+
+		
+
+<span class="nc" id="L154">	}</span>
+
+    /**
+     *  Get all the measureViews.
+     *  
+     *  @return the list of entities
+     */
+    @Transactional(readOnly = true) 
+    public List&lt;MeasureView&gt; findAll() {
+<span class="nc" id="L163">        log.debug(&quot;Request to get all MeasureViews&quot;);</span>
+<span class="nc" id="L164">        List&lt;MeasureView&gt; result = measureViewRepository.findAll();</span>
+
+<span class="nc" id="L166">        return result;</span>
+    }
+
+    /**
+     *  Get one measureView by id.
+     *
+     *  @param id the id of the entity
+     *  @return the entity
+     */
+    @Transactional(readOnly = true) 
+    public MeasureView findOne(Long id) {
+<span class="nc" id="L177">        log.debug(&quot;Request to get MeasureView : {}&quot;, id);</span>
+<span class="nc" id="L178">        MeasureView measureView = measureViewRepository.findOne(id);</span>
+<span class="nc" id="L179">        return measureView;</span>
+    }
+
+    /**
+     *  Delete the  measureView by id.
+     *
+     *  @param id the id of the entity
+     */
+    public void delete(Long id) {
+<span class="nc" id="L188">        log.debug(&quot;Request to delete MeasureView : {}&quot;, id);</span>
+<span class="nc" id="L189">        measureViewRepository.delete(id);</span>
+<span class="nc" id="L190">    }</span>
+    
+    public List&lt;MeasureView&gt; findByProject(Long id){
+<span class="nc" id="L193">		Project project = projectService.findOne(id);</span>
+<span class="nc" id="L194">		return measureViewRepository.findByProject(project);</span>
+	}
+	
+    public List&lt;MeasureView&gt; findByProjectOverview(Long id){
+<span class="nc" id="L198">		Project project = projectService.findOne(id);</span>
+<span class="nc" id="L199">		return measureViewRepository.findByProjectOverview(project);</span>
+	}
+
+    public List&lt;MeasureView&gt; findByPhase(Long id){
+<span class="nc" id="L203">		Phase phase = phaseService.findOne(id);</span>
+<span class="nc" id="L204">		return measureViewRepository.findByPhase(phase);</span>
+	}
+	
+    public List&lt;MeasureView&gt; findByPhaseOverview(Long id){
+<span class="nc" id="L208">		Phase phase = phaseService.findOne(id);</span>
+<span class="nc" id="L209">		return measureViewRepository.findByPhaseOverview(phase);</span>
+	}
+	
+    public List&lt;MeasureView&gt; findByDashboard(Long id){
+<span class="nc" id="L213">		Dashboard dashboard = dashboardService.findOne(id);</span>
+<span class="nc" id="L214">		return measureViewRepository.findByDashboard(dashboard);</span>
+	}
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.7.201606060606</span></div></body></html>

@@ -1,0 +1,280 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="fr"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Project.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Measure Platform</a> &gt; <a href="index.source.html" class="el_package">org.measure.platform.core.entity</a> &gt; <span class="el_source">Project.java</span></div><h1>Project.java</h1><pre class="source lang-java linenums">package org.measure.platform.core.entity;
+
+import java.io.Serializable;
+import java.time.ZonedDateTime;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
+
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.measure.platform.framework.domain.User;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+/**
+ * A Project.
+ */
+@Entity
+@Table(name = &quot;project&quot;)
+@Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
+<span class="nc" id="L31">public class Project implements Serializable {</span>
+
+    private static final long serialVersionUID = 1L;
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long id;
+
+    @NotNull
+    @Column(name = &quot;project_name&quot;, nullable = false)
+    private String projectName;
+
+    @Column(name = &quot;project_description&quot;)
+    private String projectDescription;
+
+    @Column(name = &quot;creation_date&quot;)
+    private ZonedDateTime creationDate;
+
+    @Column(name = &quot;project_image&quot;)
+    private String projectImage;
+
+<span class="nc" id="L52">    @OneToMany(mappedBy = &quot;project&quot;)</span>
+    @JsonIgnore
+    @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
+    private Set&lt;Phase&gt; phases = new HashSet&lt;&gt;();
+
+<span class="nc" id="L57">    @OneToMany(mappedBy = &quot;project&quot;)</span>
+    @JsonIgnore
+    @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
+    private Set&lt;MeasureInstance&gt; instances = new HashSet&lt;&gt;();
+    
+<span class="nc" id="L62">	@OneToMany(mappedBy = &quot;project&quot;)</span>
+	@JsonIgnore
+	@Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
+	private Set&lt;MeasureView&gt; views = new HashSet&lt;&gt;();
+	
+	
+<span class="nc" id="L68">	@OneToMany(mappedBy = &quot;projectoverview&quot;)</span>
+	@JsonIgnore
+	@Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
+	private Set&lt;MeasureView&gt; overviews = new HashSet&lt;&gt;();
+
+    @ManyToOne
+    private User owner;
+
+    public Long getId() {
+<span class="nc" id="L77">        return id;</span>
+    }
+
+    public void setId(Long id) {
+<span class="nc" id="L81">        this.id = id;</span>
+<span class="nc" id="L82">    }</span>
+
+    public String getProjectName() {
+<span class="nc" id="L85">        return projectName;</span>
+    }
+
+    public Project projectName(String projectName) {
+<span class="nc" id="L89">        this.projectName = projectName;</span>
+<span class="nc" id="L90">        return this;</span>
+    }
+
+    public void setProjectName(String projectName) {
+<span class="nc" id="L94">        this.projectName = projectName;</span>
+<span class="nc" id="L95">    }</span>
+
+    public String getProjectDescription() {
+<span class="nc" id="L98">        return projectDescription;</span>
+    }
+
+    public Project projectDescription(String projectDescription) {
+<span class="nc" id="L102">        this.projectDescription = projectDescription;</span>
+<span class="nc" id="L103">        return this;</span>
+    }
+
+    public void setProjectDescription(String projectDescription) {
+<span class="nc" id="L107">        this.projectDescription = projectDescription;</span>
+<span class="nc" id="L108">    }</span>
+
+    public ZonedDateTime getCreationDate() {
+<span class="nc" id="L111">        return creationDate;</span>
+    }
+
+    public Project creationDate(ZonedDateTime creationDate) {
+<span class="nc" id="L115">        this.creationDate = creationDate;</span>
+<span class="nc" id="L116">        return this;</span>
+    }
+
+    public void setCreationDate(ZonedDateTime creationDate) {
+<span class="nc" id="L120">        this.creationDate = creationDate;</span>
+<span class="nc" id="L121">    }</span>
+
+    public String getProjectImage() {
+<span class="nc" id="L124">        return projectImage;</span>
+    }
+
+    public Project projectImage(String projectImage) {
+<span class="nc" id="L128">        this.projectImage = projectImage;</span>
+<span class="nc" id="L129">        return this;</span>
+    }
+
+    public void setProjectImage(String projectImage) {
+<span class="nc" id="L133">        this.projectImage = projectImage;</span>
+<span class="nc" id="L134">    }</span>
+
+    public Set&lt;Phase&gt; getPhases() {
+<span class="nc" id="L137">        return phases;</span>
+    }
+
+    public Project phases(Set&lt;Phase&gt; phases) {
+<span class="nc" id="L141">        this.phases = phases;</span>
+<span class="nc" id="L142">        return this;</span>
+    }
+
+    public Project addPhases(Phase phase) {
+<span class="nc" id="L146">        phases.add(phase);</span>
+<span class="nc" id="L147">        phase.setProject(this);</span>
+<span class="nc" id="L148">        return this;</span>
+    }
+
+    public Project removePhases(Phase phase) {
+<span class="nc" id="L152">        phases.remove(phase);</span>
+<span class="nc" id="L153">        phase.setProject(null);</span>
+<span class="nc" id="L154">        return this;</span>
+    }
+
+    public void setPhases(Set&lt;Phase&gt; phases) {
+<span class="nc" id="L158">        this.phases = phases;</span>
+<span class="nc" id="L159">    }</span>
+
+    public Set&lt;MeasureInstance&gt; getInstances() {
+<span class="nc" id="L162">        return instances;</span>
+    }
+
+    public Project instances(Set&lt;MeasureInstance&gt; measureInstances) {
+<span class="nc" id="L166">        this.instances = measureInstances;</span>
+<span class="nc" id="L167">        return this;</span>
+    }
+
+    public Project addInstances(MeasureInstance measureInstance) {
+<span class="nc" id="L171">        instances.add(measureInstance);</span>
+<span class="nc" id="L172">        measureInstance.setProject(this);</span>
+<span class="nc" id="L173">        return this;</span>
+    }
+
+    public Project removeInstances(MeasureInstance measureInstance) {
+<span class="nc" id="L177">        instances.remove(measureInstance);</span>
+<span class="nc" id="L178">        measureInstance.setProject(null);</span>
+<span class="nc" id="L179">        return this;</span>
+    }
+
+    public void setInstances(Set&lt;MeasureInstance&gt; measureInstances) {
+<span class="nc" id="L183">        this.instances = measureInstances;</span>
+<span class="nc" id="L184">    }</span>
+
+    public User getOwner() {
+<span class="nc" id="L187">        return owner;</span>
+    }
+
+    public Project owner(User user) {
+<span class="nc" id="L191">        this.owner = user;</span>
+<span class="nc" id="L192">        return this;</span>
+    }
+
+    public void setOwner(User user) {
+<span class="nc" id="L196">        this.owner = user;</span>
+<span class="nc" id="L197">    }</span>
+
+	public Set&lt;MeasureView&gt; getViews() {
+<span class="nc" id="L200">		return views;</span>
+	}
+
+	public Project views(Set&lt;MeasureView&gt; measureViews) {
+<span class="nc" id="L204">		this.views = measureViews;</span>
+<span class="nc" id="L205">		return this;</span>
+	}
+
+	public Project addViews(MeasureView measureView) {
+<span class="nc" id="L209">		views.add(measureView);</span>
+<span class="nc" id="L210">		measureView.setProject(this);</span>
+<span class="nc" id="L211">		return this;</span>
+	}
+	
+	public Project removeViews(MeasureView measureView) {
+<span class="nc" id="L215">		views.remove(measureView);</span>
+<span class="nc" id="L216">		measureView.setProject(null);</span>
+<span class="nc" id="L217">		return this;</span>
+	}
+	
+	public void setViews(Set&lt;MeasureView&gt; measureViews) {
+<span class="nc" id="L221">		this.views = measureViews;</span>
+<span class="nc" id="L222">	}</span>
+
+	public Set&lt;MeasureView&gt; getOverviews() {
+<span class="nc" id="L225">		return overviews;</span>
+	}
+	
+	public Project overviews(Set&lt;MeasureView&gt; measureViews) {
+<span class="nc" id="L229">		this.overviews = measureViews;</span>
+<span class="nc" id="L230">		return this;</span>
+	}
+
+	public Project addOverviews(MeasureView measureView) {
+<span class="nc" id="L234">		overviews.add(measureView);</span>
+<span class="nc" id="L235">		measureView.setProjectoverview(this);</span>
+<span class="nc" id="L236">		return this;</span>
+	}
+	
+	public Project removeOverviews(MeasureView measureView) {
+<span class="nc" id="L240">		overviews.remove(measureView);</span>
+<span class="nc" id="L241">		measureView.setProjectoverview(null);</span>
+<span class="nc" id="L242">		return this;</span>
+	}
+
+	public void setOverviews(Set&lt;MeasureView&gt; measureViews) {
+<span class="nc" id="L246">		this.overviews = measureViews;</span>
+<span class="nc" id="L247">	}</span>
+	
+    @Override
+    public boolean equals(Object o) {
+<span class="nc bnc" id="L251" title="All 2 branches missed.">        if (this == o) {</span>
+<span class="nc" id="L252">            return true;</span>
+        }
+<span class="nc bnc" id="L254" title="All 4 branches missed.">        if (o == null || getClass() != o.getClass()) {</span>
+<span class="nc" id="L255">            return false;</span>
+        }
+<span class="nc" id="L257">        Project project = (Project) o;</span>
+<span class="nc bnc" id="L258" title="All 4 branches missed.">        if(project.id == null || id == null) {</span>
+<span class="nc" id="L259">            return false;</span>
+        }
+<span class="nc" id="L261">        return Objects.equals(id, project.id);</span>
+    }
+
+    @Override
+    public int hashCode() {
+<span class="nc" id="L266">        return Objects.hashCode(id);</span>
+    }
+
+    @Override
+    public String toString() {
+<span class="nc" id="L271">        return &quot;Project{&quot; +</span>
+            &quot;id=&quot; + id +
+            &quot;, projectName='&quot; + projectName + &quot;'&quot; +
+            &quot;, projectDescription='&quot; + projectDescription + &quot;'&quot; +
+            &quot;, creationDate='&quot; + creationDate + &quot;'&quot; +
+            &quot;, projectImage='&quot; + projectImage + &quot;'&quot; +
+            '}';
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.7.201606060606</span></div></body></html>

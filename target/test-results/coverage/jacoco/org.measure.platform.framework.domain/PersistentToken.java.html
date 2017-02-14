@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="fr"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>PersistentToken.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Measure Platform</a> &gt; <a href="index.source.html" class="el_package">org.measure.platform.framework.domain</a> &gt; <span class="el_source">PersistentToken.java</span></div><h1>PersistentToken.java</h1><pre class="source lang-java linenums">package org.measure.platform.framework.domain;
+
+import java.io.Serializable;
+import java.time.LocalDate;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+/**
+ * Persistent tokens are used by Spring Security to automatically log in users.
+ *
+ * @see org.measure.platform.framework.security.CustomPersistentRememberMeServices
+ */
+@Entity
+@Table(name = &quot;jhi_persistent_token&quot;)
+@Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
+<span class="nc" id="L27">public class PersistentToken implements Serializable {</span>
+
+    private static final long serialVersionUID = 1L;
+
+    private static final int MAX_USER_AGENT_LEN = 255;
+
+    @Id
+    private String series;
+
+    @JsonIgnore
+    @NotNull
+    @Column(name = &quot;token_value&quot;, nullable = false)
+    private String tokenValue;
+    
+    @Column(name = &quot;token_date&quot;)
+    private LocalDate tokenDate;
+
+    //an IPV6 address max length is 39 characters
+    @Size(min = 0, max = 39)
+    @Column(name = &quot;ip_address&quot;, length = 39)
+    private String ipAddress;
+
+    @Column(name = &quot;user_agent&quot;)
+    private String userAgent;
+
+    @JsonIgnore
+    @ManyToOne
+    private User user;
+
+    public String getSeries() {
+<span class="nc" id="L57">        return series;</span>
+    }
+
+    public void setSeries(String series) {
+<span class="nc" id="L61">        this.series = series;</span>
+<span class="nc" id="L62">    }</span>
+
+    public String getTokenValue() {
+<span class="nc" id="L65">        return tokenValue;</span>
+    }
+
+    public void setTokenValue(String tokenValue) {
+<span class="nc" id="L69">        this.tokenValue = tokenValue;</span>
+<span class="nc" id="L70">    }</span>
+
+    public LocalDate getTokenDate() {
+<span class="nc" id="L73">        return tokenDate;</span>
+    }
+
+    public void setTokenDate(LocalDate tokenDate) {
+<span class="nc" id="L77">        this.tokenDate = tokenDate;</span>
+<span class="nc" id="L78">    }</span>
+
+    public String getIpAddress() {
+<span class="nc" id="L81">        return ipAddress;</span>
+    }
+
+    public void setIpAddress(String ipAddress) {
+<span class="nc" id="L85">        this.ipAddress = ipAddress;</span>
+<span class="nc" id="L86">    }</span>
+
+    public String getUserAgent() {
+<span class="nc" id="L89">        return userAgent;</span>
+    }
+
+    public void setUserAgent(String userAgent) {
+<span class="nc bnc" id="L93" title="All 2 branches missed.">        if (userAgent.length() &gt;= MAX_USER_AGENT_LEN) {</span>
+<span class="nc" id="L94">            this.userAgent = userAgent.substring(0, MAX_USER_AGENT_LEN - 1);</span>
+        } else {
+<span class="nc" id="L96">            this.userAgent = userAgent;</span>
+        }
+<span class="nc" id="L98">    }</span>
+
+    public User getUser() {
+<span class="nc" id="L101">        return user;</span>
+    }
+
+    public void setUser(User user) {
+<span class="nc" id="L105">        this.user = user;</span>
+<span class="nc" id="L106">    }</span>
+
+    @Override
+    public boolean equals(Object o) {
+<span class="nc bnc" id="L110" title="All 2 branches missed.">        if (this == o) {</span>
+<span class="nc" id="L111">            return true;</span>
+        }
+<span class="nc bnc" id="L113" title="All 4 branches missed.">        if (o == null || getClass() != o.getClass()) {</span>
+<span class="nc" id="L114">            return false;</span>
+        }
+
+<span class="nc" id="L117">        PersistentToken that = (PersistentToken) o;</span>
+
+<span class="nc bnc" id="L119" title="All 2 branches missed.">        if (!series.equals(that.series)) {</span>
+<span class="nc" id="L120">            return false;</span>
+        }
+
+<span class="nc" id="L123">        return true;</span>
+    }
+
+    @Override
+    public int hashCode() {
+<span class="nc" id="L128">        return series.hashCode();</span>
+    }
+
+    @Override
+    public String toString() {
+<span class="nc" id="L133">        return &quot;PersistentToken{&quot; +</span>
+            &quot;series='&quot; + series + '\'' +
+            &quot;, tokenValue='&quot; + tokenValue + '\'' +
+            &quot;, tokenDate=&quot; + tokenDate +
+            &quot;, ipAddress='&quot; + ipAddress + '\'' +
+            &quot;, userAgent='&quot; + userAgent + '\'' +
+            &quot;}&quot;;
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.7.201606060606</span></div></body></html>

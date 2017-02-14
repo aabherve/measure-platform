@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="fr"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ExceptionHandlingAsyncTaskExecutor.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Measure Platform</a> &gt; <a href="index.source.html" class="el_package">org.measure.platform.framework.async</a> &gt; <span class="el_source">ExceptionHandlingAsyncTaskExecutor.java</span></div><h1>ExceptionHandlingAsyncTaskExecutor.java</h1><pre class="source lang-java linenums">package org.measure.platform.framework.async;
+
+import java.util.concurrent.Callable;
+import java.util.concurrent.Future;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.DisposableBean;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.core.task.AsyncTaskExecutor;
+
+public class ExceptionHandlingAsyncTaskExecutor implements AsyncTaskExecutor,
+    InitializingBean, DisposableBean {
+
+<span class="fc" id="L15">    private final Logger log = LoggerFactory.getLogger(ExceptionHandlingAsyncTaskExecutor.class);</span>
+
+    private final AsyncTaskExecutor executor;
+
+<span class="fc" id="L19">    public ExceptionHandlingAsyncTaskExecutor(AsyncTaskExecutor executor) {</span>
+<span class="fc" id="L20">        this.executor = executor;</span>
+<span class="fc" id="L21">    }</span>
+
+    @Override
+    public void execute(Runnable task) {
+<span class="nc" id="L25">        executor.execute(createWrappedRunnable(task));</span>
+<span class="nc" id="L26">    }</span>
+
+    @Override
+    public void execute(Runnable task, long startTimeout) {
+<span class="nc" id="L30">        executor.execute(createWrappedRunnable(task), startTimeout);</span>
+<span class="nc" id="L31">    }</span>
+
+    private &lt;T&gt; Callable&lt;T&gt; createCallable(final Callable&lt;T&gt; task) {
+<span class="nc" id="L34">        return () -&gt; {</span>
+            try {
+<span class="nc" id="L36">                return task.call();</span>
+<span class="nc" id="L37">            } catch (Exception e) {</span>
+<span class="nc" id="L38">                handle(e);</span>
+<span class="nc" id="L39">                throw e;</span>
+            }
+        };
+    }
+
+    private Runnable createWrappedRunnable(final Runnable task) {
+<span class="nc" id="L45">        return () -&gt; {</span>
+            try {
+<span class="nc" id="L47">                task.run();</span>
+<span class="nc" id="L48">            } catch (Exception e) {</span>
+<span class="nc" id="L49">                handle(e);</span>
+<span class="nc" id="L50">            }</span>
+<span class="nc" id="L51">        };</span>
+    }
+
+    protected void handle(Exception e) {
+<span class="nc" id="L55">        log.error(&quot;Caught async exception&quot;, e);</span>
+<span class="nc" id="L56">    }</span>
+
+    @Override
+    public Future&lt;?&gt; submit(Runnable task) {
+<span class="nc" id="L60">        return executor.submit(createWrappedRunnable(task));</span>
+    }
+
+    @Override
+    public &lt;T&gt; Future&lt;T&gt; submit(Callable&lt;T&gt; task) {
+<span class="nc" id="L65">        return executor.submit(createCallable(task));</span>
+    }
+
+    @Override
+    public void destroy() throws Exception {
+<span class="pc bpc" id="L70" title="1 of 2 branches missed.">        if (executor instanceof DisposableBean) {</span>
+<span class="fc" id="L71">            DisposableBean bean = (DisposableBean) executor;</span>
+<span class="fc" id="L72">            bean.destroy();</span>
+        }
+<span class="fc" id="L74">    }</span>
+
+    @Override
+    public void afterPropertiesSet() throws Exception {
+<span class="pc bpc" id="L78" title="1 of 2 branches missed.">        if (executor instanceof InitializingBean) {</span>
+<span class="fc" id="L79">            InitializingBean bean = (InitializingBean) executor;</span>
+<span class="fc" id="L80">            bean.afterPropertiesSet();</span>
+        }
+<span class="fc" id="L82">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.7.201606060606</span></div></body></html>

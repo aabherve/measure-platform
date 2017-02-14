@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="fr"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ElasticMeasurementStorage.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Measure Platform</a> &gt; <a href="index.source.html" class="el_package">org.measure.platform.measurementstorage.impl</a> &gt; <span class="el_source">ElasticMeasurementStorage.java</span></div><h1>ElasticMeasurementStorage.java</h1><pre class="source lang-java linenums">package org.measure.platform.measurementstorage.impl;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+import javax.inject.Inject;
+
+import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.action.search.SearchType;
+import org.elasticsearch.client.transport.TransportClient;
+import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.index.query.QueryStringQueryBuilder;
+import org.elasticsearch.search.SearchHit;
+import org.elasticsearch.search.sort.SortOrder;
+import org.measure.platform.measurementstorage.api.IMeasurementStorage;
+import org.measure.smm.measure.api.IMeasurement;
+import org.measure.smm.measure.defaultimpl.measurements.DefaultMeasurement;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
+
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+@Service
+<span class="nc" id="L28">public class ElasticMeasurementStorage implements IMeasurementStorage {</span>
+
+<span class="nc" id="L30">	private final Logger log = LoggerFactory.getLogger(ElasticMeasurementStorage.class);</span>
+
+	@Inject
+	private ElasticConnection connection;
+
+	@Override
+	public void putMeasurement(String measureInstance, Boolean manageLast, IMeasurement measurement) {
+<span class="nc" id="L37">		log.debug(&quot;putMeasurement[&quot; + measureInstance + &quot;]: &quot; + measurement.getValues());</span>
+<span class="nc" id="L38">		TransportClient client = connection.getClient();</span>
+<span class="nc" id="L39">		client.prepareIndex(&quot;measure&quot;, measureInstance).setSource(measurement.getValues()).get();</span>
+<span class="nc" id="L40">		client.prepareIndex(&quot;measure&quot;, measureInstance + &quot;-last&quot;, &quot;last&quot;).setSource(measurement.getValues()).get();			</span>
+<span class="nc" id="L41">	}</span>
+
+	@Override
+	public IMeasurement getLastMeasurement(String measureInstance) {
+<span class="nc" id="L45">		TransportClient client = connection.getClient();</span>
+<span class="nc" id="L46">		SearchResponse response = client.prepareSearch(&quot;measure&quot;).setTypes(measureInstance + &quot;-last&quot;).setIndices(&quot;last&quot;)</span>
+<span class="nc" id="L47">				.setSearchType(SearchType.DFS_QUERY_THEN_FETCH).setSize(1).get();</span>
+
+<span class="nc" id="L49">		SearchHit[] results = response.getHits().getHits();</span>
+<span class="nc bnc" id="L50" title="All 2 branches missed.">		for (SearchHit hit : results) {</span>
+<span class="nc" id="L51">			String sourceAsString = hit.getSourceAsString();</span>
+			
+<span class="nc" id="L53">			IMeasurement measurement = new DefaultMeasurement();</span>
+			try {
+<span class="nc" id="L55">				measurement.setValues(new ObjectMapper().readValue(sourceAsString, new TypeReference&lt;Map&lt;String, Object&gt;&gt;() {}));</span>
+<span class="nc" id="L56">			} catch (IOException e) {</span>
+<span class="nc" id="L57">				e.printStackTrace();</span>
+<span class="nc" id="L58">			}</span>
+			
+<span class="nc" id="L60">			return measurement;</span>
+		}
+<span class="nc" id="L62">		return null;</span>
+	}
+
+	@Override
+	public List&lt;IMeasurement&gt; getMeasurement(String measureInstance, Integer numberRef, String filter) {
+
+<span class="nc" id="L68">		List&lt;IMeasurement&gt; measurements = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L69">		TransportClient client = connection.getClient();</span>
+
+<span class="nc" id="L71">		SearchResponse response = null;</span>
+
+<span class="nc bnc" id="L73" title="All 4 branches missed.">		if (filter != null &amp;&amp; !filter.equals(&quot;&quot;)) {</span>
+<span class="nc" id="L74">			QueryStringQueryBuilder qb = QueryBuilders.queryStringQuery(filter);</span>
+			try{
+<span class="nc" id="L76">				response = client.prepareSearch(&quot;measure&quot;).setTypes(measureInstance).setQuery(qb)</span>
+<span class="nc" id="L77">						.addSort(&quot;postDate&quot;, SortOrder.DESC).setSearchType(SearchType.DFS_QUERY_THEN_FETCH)</span>
+<span class="nc" id="L78">						.setSize(numberRef).get();</span>
+<span class="nc" id="L79">			}catch(Exception e){</span>
+<span class="nc" id="L80">				e.printStackTrace();</span>
+<span class="nc" id="L81">			}</span>
+<span class="nc" id="L82">		} else {</span>
+<span class="nc" id="L83">			response = client.prepareSearch(&quot;measure&quot;).setTypes(measureInstance).addSort(&quot;postDate&quot;, SortOrder.DESC)</span>
+<span class="nc" id="L84">					.setSearchType(SearchType.DFS_QUERY_THEN_FETCH).setSize(numberRef).get();</span>
+		}
+
+<span class="nc" id="L87">		SearchHit[] results = response.getHits().getHits();</span>
+<span class="nc bnc" id="L88" title="All 2 branches missed.">		for (SearchHit hit : results) {</span>
+<span class="nc" id="L89">			String sourceAsString = hit.getSourceAsString();</span>
+			try {
+<span class="nc" id="L91">				IMeasurement measurement = new DefaultMeasurement();</span>
+<span class="nc" id="L92">				measurement.setValues(new ObjectMapper().readValue(sourceAsString, new TypeReference&lt;Map&lt;String, Object&gt;&gt;() {}));</span>
+<span class="nc" id="L93">				measurements.add(measurement);</span>
+<span class="nc" id="L94">			} catch (IOException e) {</span>
+<span class="nc" id="L95">				e.printStackTrace();</span>
+<span class="nc" id="L96">			}</span>
+		}
+<span class="nc" id="L98">		return measurements;</span>
+	}
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.7.201606060606</span></div></body></html>

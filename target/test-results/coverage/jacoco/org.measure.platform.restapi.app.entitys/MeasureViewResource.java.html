@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="fr"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MeasureViewResource.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Measure Platform</a> &gt; <a href="index.source.html" class="el_package">org.measure.platform.restapi.app.entitys</a> &gt; <span class="el_source">MeasureViewResource.java</span></div><h1>MeasureViewResource.java</h1><pre class="source lang-java linenums">package org.measure.platform.restapi.app.entitys;
+
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.List;
+import java.util.Optional;
+
+import javax.inject.Inject;
+
+import org.measure.platform.core.api.entitys.MeasureViewService;
+import org.measure.platform.core.entity.MeasureView;
+import org.measure.platform.restapi.framework.rest.util.HeaderUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.codahale.metrics.annotation.Timed;
+
+/**
+ * REST controller for managing MeasureView.
+ */
+@RestController
+@RequestMapping(&quot;/api&quot;)
+<span class="nc" id="L33">public class MeasureViewResource {</span>
+
+<span class="nc" id="L35">    private final Logger log = LoggerFactory.getLogger(MeasureViewResource.class);</span>
+        
+    @Inject
+    private MeasureViewService measureViewService;
+
+    /**
+     * POST  /measure-views : Create a new measureView.
+     *
+     * @param measureView the measureView to create
+     * @return the ResponseEntity with status 201 (Created) and with body the new measureView, or with status 400 (Bad Request) if the measureView has already an ID
+     * @throws URISyntaxException if the Location URI syntax is incorrect
+     */
+    @PostMapping(&quot;/measure-views&quot;)
+    @Timed
+    public ResponseEntity&lt;MeasureView&gt; createMeasureView(@RequestBody MeasureView measureView) throws URISyntaxException {
+<span class="nc" id="L50">        log.debug(&quot;REST request to save MeasureView : {}&quot;, measureView);</span>
+<span class="nc bnc" id="L51" title="All 2 branches missed.">        if (measureView.getId() != null) {</span>
+<span class="nc" id="L52">            return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(&quot;measureView&quot;, &quot;idexists&quot;, &quot;A new measureView cannot already have an ID&quot;)).body(null);</span>
+        }
+<span class="nc" id="L54">        MeasureView result = measureViewService.save(measureView);</span>
+<span class="nc" id="L55">        return ResponseEntity.created(new URI(&quot;/api/measure-views/&quot; + result.getId()))</span>
+<span class="nc" id="L56">            .headers(HeaderUtil.createEntityCreationAlert(&quot;measureView&quot;, result.getId().toString()))</span>
+<span class="nc" id="L57">            .body(result);</span>
+    }
+
+    /**
+     * PUT  /measure-views : Updates an existing measureView.
+     *
+     * @param measureView the measureView to update
+     * @return the ResponseEntity with status 200 (OK) and with body the updated measureView,
+     * or with status 400 (Bad Request) if the measureView is not valid,
+     * or with status 500 (Internal Server Error) if the measureView couldnt be updated
+     * @throws URISyntaxException if the Location URI syntax is incorrect
+     */
+    @PutMapping(&quot;/measure-views&quot;)
+    @Timed
+    public ResponseEntity&lt;MeasureView&gt; updateMeasureView(@RequestBody MeasureView measureView) throws URISyntaxException {
+<span class="nc" id="L72">        log.debug(&quot;REST request to update MeasureView : {}&quot;, measureView);</span>
+<span class="nc bnc" id="L73" title="All 2 branches missed.">        if (measureView.getId() == null) {</span>
+<span class="nc" id="L74">            return createMeasureView(measureView);</span>
+        }
+<span class="nc" id="L76">        MeasureView result = measureViewService.save(measureView);</span>
+<span class="nc" id="L77">        return ResponseEntity.ok()</span>
+<span class="nc" id="L78">            .headers(HeaderUtil.createEntityUpdateAlert(&quot;measureView&quot;, measureView.getId().toString()))</span>
+<span class="nc" id="L79">            .body(result);</span>
+    }
+
+    /**
+     * GET  /measure-views : get all the measureViews.
+     *
+     * @return the ResponseEntity with status 200 (OK) and the list of measureViews in body
+     */
+    @GetMapping(&quot;/measure-views&quot;)
+    @Timed
+    public List&lt;MeasureView&gt; getAllMeasureViews() {
+<span class="nc" id="L90">        log.debug(&quot;REST request to get all MeasureViews&quot;);</span>
+<span class="nc" id="L91">        return measureViewService.findAll();</span>
+    }
+
+    /**
+     * GET  /measure-views/:id : get the &quot;id&quot; measureView.
+     *
+     * @param id the id of the measureView to retrieve
+     * @return the ResponseEntity with status 200 (OK) and with body the measureView, or with status 404 (Not Found)
+     */
+    @GetMapping(&quot;/measure-views/{id}&quot;)
+    @Timed
+    public ResponseEntity&lt;MeasureView&gt; getMeasureView(@PathVariable Long id) {
+<span class="nc" id="L103">        log.debug(&quot;REST request to get MeasureView : {}&quot;, id);</span>
+<span class="nc" id="L104">        MeasureView measureView = measureViewService.findOne(id);</span>
+<span class="nc" id="L105">        return Optional.ofNullable(measureView)</span>
+<span class="nc" id="L106">            .map(result -&gt; new ResponseEntity&lt;&gt;(</span>
+                result,
+                HttpStatus.OK))
+<span class="nc" id="L109">            .orElse(new ResponseEntity&lt;&gt;(HttpStatus.NOT_FOUND));</span>
+    }
+
+    /**
+     * DELETE  /measure-views/:id : delete the &quot;id&quot; measureView.
+     *
+     * @param id the id of the measureView to delete
+     * @return the ResponseEntity with status 200 (OK)
+     */
+    @DeleteMapping(&quot;/measure-views/{id}&quot;)
+    @Timed
+    public ResponseEntity&lt;Void&gt; deleteMeasureView(@PathVariable Long id) {
+<span class="nc" id="L121">        log.debug(&quot;REST request to delete MeasureView : {}&quot;, id);</span>
+<span class="nc" id="L122">        measureViewService.delete(id);</span>
+<span class="nc" id="L123">        return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(&quot;measureView&quot;, id.toString())).build();</span>
+    }
+    
+    
+    @GetMapping(&quot;/measureview/byproject/{id}&quot;)
+    @Timed
+    public List&lt;MeasureView&gt; getMeasureViewByProject(@PathVariable Long id) {	
+<span class="nc" id="L130">        return measureViewService.findByProject(id);</span>
+    }
+    
+    @GetMapping(&quot;/measureview/byprojectoverview/{id}&quot;)
+    @Timed
+    public List&lt;MeasureView&gt; getMeasureViewByProjectOverview(@PathVariable Long id) {	
+<span class="nc" id="L136">        return measureViewService.findByProjectOverview(id);</span>
+    }
+    
+    @GetMapping(&quot;/measureview/byphase/{id}&quot;)
+    @Timed
+    public List&lt;MeasureView&gt; getMeasureViewByPhase(@PathVariable Long id) {	
+<span class="nc" id="L142">        return measureViewService.findByPhase(id);</span>
+    }
+    
+    @GetMapping(&quot;/measureview/byphaseoverview/{id}&quot;)
+    @Timed
+    public List&lt;MeasureView&gt; getMeasureViewByPhaseOverview(@PathVariable Long id) {	
+<span class="nc" id="L148">        return measureViewService.findByPhaseOverview(id);</span>
+    }
+    
+    @GetMapping(&quot;/measureview/bydashboard/{id}&quot;)
+    @Timed
+    public List&lt;MeasureView&gt; getMeasureViewByDashboard(@PathVariable Long id) {	
+<span class="nc" id="L154">        return measureViewService.findByDashboard(id);</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.7.201606060606</span></div></body></html>

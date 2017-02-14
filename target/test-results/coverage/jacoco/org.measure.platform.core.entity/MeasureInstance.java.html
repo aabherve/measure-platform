@@ -1,0 +1,407 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="fr"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MeasureInstance.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Measure Platform</a> &gt; <a href="index.source.html" class="el_package">org.measure.platform.core.entity</a> &gt; <span class="el_source">MeasureInstance.java</span></div><h1>MeasureInstance.java</h1><pre class="source lang-java linenums">package org.measure.platform.core.entity;
+
+import java.io.Serializable;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
+
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.measure.platform.core.api.entitys.enumeration.MeasureType;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+/**
+ * A MeasureInstance.
+ */
+@Entity
+@Table(name = &quot;measure_instance&quot;)
+@Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
+<span class="nc" id="L32">public class MeasureInstance implements Serializable {</span>
+
+	private static final long serialVersionUID = 1L;
+
+	@Id
+	@GeneratedValue(strategy = GenerationType.AUTO)
+	private Long id;
+
+	@NotNull
+	@Column(name = &quot;instance_name&quot;, nullable = false)
+	private String instanceName;
+
+	@Column(name = &quot;instance_description&quot;)
+	private String instanceDescription;
+
+	@NotNull
+	@Column(name = &quot;measure_name&quot;, nullable = false)
+	private String measureName;
+
+	@NotNull
+	@Column(name = &quot;measure_version&quot;, nullable = false)
+	private String measureVersion;
+
+	@Column(name = &quot;is_shedule&quot;)
+	private Boolean isShedule;
+
+	@Column(name = &quot;sheduling_expression&quot;)
+	private String shedulingExpression;
+
+	@Enumerated(EnumType.STRING)
+	@Column(name = &quot;measure_type&quot;)
+	private MeasureType measureType;
+
+	@Column(name = &quot;manage_last_measurement&quot;)
+	private Boolean manageLastMeasurement;
+	
+	@Column(name = &quot;remote_adress&quot;)
+	private String remoteAdress;
+	
+	@Column(name = &quot;remote_label&quot;)
+	private String remoteLabel;
+	
+	@Column(name = &quot;is_remote&quot;)
+	private Boolean isRemote;
+
+	@ManyToOne
+	private Project project;
+
+<span class="nc" id="L80">	@OneToMany(mappedBy = &quot;measureInstance&quot;)</span>
+	@JsonIgnore
+	@Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
+	private Set&lt;MeasureProperty&gt; properties = new HashSet&lt;&gt;();
+
+<span class="nc" id="L85">	@OneToMany(mappedBy = &quot;ownerInstance&quot;)</span>
+	@JsonIgnore
+	@Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
+	private Set&lt;MeasureReference&gt; ownedReferences = new HashSet&lt;&gt;();
+
+<span class="nc" id="L90">	@OneToMany(mappedBy = &quot;referencedInstance&quot;)</span>
+	@JsonIgnore
+	@Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
+	private Set&lt;MeasureReference&gt; referenceInstances = new HashSet&lt;&gt;();
+
+	public Long getId() {
+<span class="nc" id="L96">		return id;</span>
+	}
+
+	public void setId(Long id) {
+<span class="nc" id="L100">		this.id = id;</span>
+<span class="nc" id="L101">	}</span>
+	
+	
+
+	public String getInstanceName() {
+<span class="nc" id="L106">		return instanceName;</span>
+	}
+
+	public MeasureInstance instanceName(String instanceName) {
+<span class="nc" id="L110">		this.instanceName = instanceName;</span>
+<span class="nc" id="L111">		return this;</span>
+	}
+
+	public void setInstanceName(String instanceName) {
+<span class="nc" id="L115">		this.instanceName = instanceName;</span>
+<span class="nc" id="L116">	}</span>
+
+	public String getInstanceDescription() {
+<span class="nc" id="L119">		return instanceDescription;</span>
+	}
+
+	public MeasureInstance instanceDescription(String instanceDescription) {
+<span class="nc" id="L123">		this.instanceDescription = instanceDescription;</span>
+<span class="nc" id="L124">		return this;</span>
+	}
+
+	public void setInstanceDescription(String instanceDescription) {
+<span class="nc" id="L128">		this.instanceDescription = instanceDescription;</span>
+<span class="nc" id="L129">	}</span>
+
+	public String getMeasureName() {
+<span class="nc" id="L132">		return measureName;</span>
+	}
+
+	public MeasureInstance measureName(String measureName) {
+<span class="nc" id="L136">		this.measureName = measureName;</span>
+<span class="nc" id="L137">		return this;</span>
+	}
+
+	public void setMeasureName(String measureName) {
+<span class="nc" id="L141">		this.measureName = measureName;</span>
+<span class="nc" id="L142">	}</span>
+
+	public String getMeasureVersion() {
+<span class="nc" id="L145">		return measureVersion;</span>
+	}
+
+	public MeasureInstance measureVersion(String measureVersion) {
+<span class="nc" id="L149">		this.measureVersion = measureVersion;</span>
+<span class="nc" id="L150">		return this;</span>
+	}
+
+	public void setMeasureVersion(String measureVersion) {
+<span class="nc" id="L154">		this.measureVersion = measureVersion;</span>
+<span class="nc" id="L155">	}</span>
+
+	public Boolean isIsShedule() {
+<span class="nc" id="L158">		return isShedule;</span>
+	}
+
+	public MeasureInstance isShedule(Boolean isShedule) {
+<span class="nc" id="L162">		this.isShedule = isShedule;</span>
+<span class="nc" id="L163">		return this;</span>
+	}
+
+	public void setIsShedule(Boolean isShedule) {
+<span class="nc" id="L167">		this.isShedule = isShedule;</span>
+<span class="nc" id="L168">	}</span>
+	
+	
+	public Boolean isIsRemote() {
+<span class="nc" id="L172">		return isRemote;</span>
+	}
+
+	public MeasureInstance isRemote(Boolean isRemote) {
+<span class="nc" id="L176">		this.isRemote = isRemote;</span>
+<span class="nc" id="L177">		return this;</span>
+	}
+
+	public void setIsRemote(Boolean isRemote) {
+<span class="nc" id="L181">		this.isRemote = isRemote;</span>
+<span class="nc" id="L182">	}</span>
+	
+	public String getRemoteAdress() {
+<span class="nc" id="L185">		return remoteAdress;</span>
+	}
+
+	public MeasureInstance remoteAdress(String remoteAdress) {
+<span class="nc" id="L189">		this.remoteAdress = remoteAdress;</span>
+<span class="nc" id="L190">		return this;</span>
+	}
+
+	public void setRemoteAdress(String remoteIp) {
+<span class="nc" id="L194">		this.remoteAdress = remoteIp;</span>
+<span class="nc" id="L195">	}</span>
+	
+	
+	public String getRemoteLabel() {
+<span class="nc" id="L199">		return remoteLabel;</span>
+	}
+
+	public MeasureInstance remoteLabel(String remoteLabel) {
+<span class="nc" id="L203">		this.remoteLabel = remoteLabel;</span>
+<span class="nc" id="L204">		return this;</span>
+	}
+
+	public void setRemoteLabel(String remoteLabel) {
+<span class="nc" id="L208">		this.remoteLabel = remoteLabel;</span>
+<span class="nc" id="L209">	}</span>
+
+	public String getShedulingExpression() {
+<span class="nc" id="L212">		return shedulingExpression;</span>
+	}
+
+	public MeasureInstance shedulingExpression(String shedulingExpression) {
+<span class="nc" id="L216">		this.shedulingExpression = shedulingExpression;</span>
+<span class="nc" id="L217">		return this;</span>
+	}
+
+	public void setShedulingExpression(String shedulingExpression) {
+<span class="nc" id="L221">		this.shedulingExpression = shedulingExpression;</span>
+<span class="nc" id="L222">	}</span>
+
+	public MeasureType getMeasureType() {
+<span class="nc" id="L225">		return measureType;</span>
+	}
+
+	public MeasureInstance measureType(MeasureType measureType) {
+<span class="nc" id="L229">		this.measureType = measureType;</span>
+<span class="nc" id="L230">		return this;</span>
+	}
+
+	public void setMeasureType(MeasureType measureType) {
+<span class="nc" id="L234">		this.measureType = measureType;</span>
+<span class="nc" id="L235">	}</span>
+
+	public Boolean isManageLastMeasurement() {
+<span class="nc" id="L238">		return manageLastMeasurement;</span>
+	}
+
+	public MeasureInstance manageLastMeasurement(Boolean manageLastMeasurement) {
+<span class="nc" id="L242">		this.manageLastMeasurement = manageLastMeasurement;</span>
+<span class="nc" id="L243">		return this;</span>
+	}
+
+	public void setManageLastMeasurement(Boolean manageLastMeasurement) {
+<span class="nc" id="L247">		this.manageLastMeasurement = manageLastMeasurement;</span>
+<span class="nc" id="L248">	}</span>
+
+	public Project getProject() {
+<span class="nc" id="L251">		return project;</span>
+	}
+
+	public MeasureInstance project(Project project) {
+<span class="nc" id="L255">		this.project = project;</span>
+<span class="nc" id="L256">		return this;</span>
+	}
+
+	public void setProject(Project project) {
+<span class="nc" id="L260">		this.project = project;</span>
+<span class="nc" id="L261">	}</span>
+
+	public Set&lt;MeasureProperty&gt; getProperties() {
+<span class="nc" id="L264">		return properties;</span>
+	}
+
+	public MeasureInstance properties(Set&lt;MeasureProperty&gt; measureProperties) {
+<span class="nc" id="L268">		this.properties = measureProperties;</span>
+<span class="nc" id="L269">		return this;</span>
+	}
+
+	public MeasureInstance addProperties(MeasureProperty measureProperty) {
+<span class="nc" id="L273">		properties.add(measureProperty);</span>
+<span class="nc" id="L274">		measureProperty.setMeasureInstance(this);</span>
+<span class="nc" id="L275">		return this;</span>
+	}
+
+	public MeasureInstance removeProperties(MeasureProperty measureProperty) {
+<span class="nc" id="L279">		properties.remove(measureProperty);</span>
+<span class="nc" id="L280">		measureProperty.setMeasureInstance(null);</span>
+<span class="nc" id="L281">		return this;</span>
+	}
+
+	public void setProperties(Set&lt;MeasureProperty&gt; measureProperties) {
+<span class="nc" id="L285">		this.properties = measureProperties;</span>
+<span class="nc" id="L286">	}</span>
+	
+	public MeasureInstance ownedReferences(Set&lt;MeasureReference&gt; ownedReferences) {
+<span class="nc" id="L289">		this.ownedReferences = ownedReferences;</span>
+<span class="nc" id="L290">		return this;</span>
+	}
+
+	public MeasureInstance addOwnedReferences(MeasureReference ownedReference) {
+<span class="nc" id="L294">		ownedReferences.add(ownedReference);</span>
+<span class="nc" id="L295">		ownedReference.setOwnerInstance(this);</span>
+<span class="nc" id="L296">		return this;</span>
+	}
+
+	public MeasureInstance removeOwnedReferences(MeasureReference ownedReference) {
+<span class="nc" id="L300">		ownedReferences.remove(ownedReference);</span>
+<span class="nc" id="L301">		ownedReference.setOwnerInstance(null);</span>
+<span class="nc" id="L302">		return this;</span>
+	}
+
+	public void setOwnedReferences(Set&lt;MeasureReference&gt; ownedReferences) {
+<span class="nc" id="L306">		this.ownedReferences = ownedReferences;</span>
+<span class="nc" id="L307">	}</span>
+	
+	
+	
+	public Set&lt;MeasureReference&gt; getOwnedReferences() {
+<span class="nc" id="L312">		return this.ownedReferences;</span>
+	}
+
+	public MeasureInstance referenceInstances(Set&lt;MeasureReference&gt; referenceInstances) {
+<span class="nc" id="L316">		this.referenceInstances = referenceInstances;</span>
+<span class="nc" id="L317">		return this;</span>
+	}
+
+	public MeasureInstance addReferenceInstances(MeasureReference referenceInstance) {
+<span class="nc" id="L321">		ownedReferences.add(referenceInstance);</span>
+<span class="nc" id="L322">		referenceInstance.setReferencedInstance(this);</span>
+<span class="nc" id="L323">		return this;</span>
+	}
+
+	public MeasureInstance removeReferenceInstances(MeasureReference referenceInstance) {
+<span class="nc" id="L327">		referenceInstances.remove(referenceInstance);</span>
+<span class="nc" id="L328">		referenceInstance.setReferencedInstance(null);</span>
+<span class="nc" id="L329">		return this;</span>
+	}
+
+	public void setReferenceInstances(Set&lt;MeasureReference&gt; referenceInstances) {
+<span class="nc" id="L333">		this.referenceInstances = referenceInstances;</span>
+<span class="nc" id="L334">	}</span>
+	
+	public Set&lt;MeasureReference&gt; getReferenceInstances() {
+<span class="nc" id="L337">		return this.referenceInstances;</span>
+	}
+
+	// public MeasureInstance getMeasureInstance() {
+	// return measureInstance;
+	// }
+	//
+	// public MeasureInstance measureInstance(MeasureInstance measureInstance) {
+	// this.measureInstance = measureInstance;
+	// return this;
+	// }
+	//
+	// public void setMeasureInstance(MeasureInstance measureInstance) {
+	// this.measureInstance = measureInstance;
+	// }
+	//
+	// public Set&lt;MeasureInstance&gt; getDepends() {
+	// return depends;
+	// }
+	//
+	// public MeasureInstance depends(Set&lt;MeasureInstance&gt; measureInstances) {
+	// this.depends = measureInstances;
+	// return this;
+	// }
+	//
+	// public MeasureInstance addDepends(MeasureInstance measureInstance) {
+	// depends.add(measureInstance);
+	// measureInstance.setMeasureInstance(this);
+	// return this;
+	// }
+	//
+	// public MeasureInstance removeDepends(MeasureInstance measureInstance) {
+	// depends.remove(measureInstance);
+	// measureInstance.setMeasureInstance(null);
+	// return this;
+	// }
+	//
+	// public void setDepends(Set&lt;MeasureInstance&gt; measureInstances) {
+	// this.depends = measureInstances;
+	// }
+
+	@Override
+	public boolean equals(Object o) {
+<span class="nc bnc" id="L380" title="All 2 branches missed.">		if (this == o) {</span>
+<span class="nc" id="L381">			return true;</span>
+		}
+<span class="nc bnc" id="L383" title="All 4 branches missed.">		if (o == null || getClass() != o.getClass()) {</span>
+<span class="nc" id="L384">			return false;</span>
+		}
+<span class="nc" id="L386">		MeasureInstance measureInstance = (MeasureInstance) o;</span>
+<span class="nc bnc" id="L387" title="All 4 branches missed.">		if (measureInstance.id == null || id == null) {</span>
+<span class="nc" id="L388">			return false;</span>
+		}
+<span class="nc" id="L390">		return Objects.equals(id, measureInstance.id);</span>
+	}
+
+	@Override
+	public int hashCode() {
+<span class="nc" id="L395">		return Objects.hashCode(id);</span>
+	}
+
+	@Override
+	public String toString() {
+<span class="nc" id="L400">		return &quot;MeasureInstance{&quot; + &quot;id=&quot; + id + &quot;, instanceName='&quot; + instanceName + &quot;'&quot; + &quot;, instanceDescription='&quot;</span>
+				+ instanceDescription + &quot;'&quot; + &quot;, measureName='&quot; + measureName + &quot;'&quot; + &quot;, measureVersion='&quot;
+				+ measureVersion + &quot;'&quot; + &quot;, isShedule='&quot; + isShedule + &quot;'&quot; + &quot;, shedulingExpression='&quot;
+				+ shedulingExpression + &quot;'&quot; + &quot;, measureType='&quot; + measureType + &quot;'&quot; + &quot;, manageLastMeasurement='&quot;
+				+ manageLastMeasurement + &quot;'&quot; + '}';
+	}
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.7.201606060606</span></div></body></html>

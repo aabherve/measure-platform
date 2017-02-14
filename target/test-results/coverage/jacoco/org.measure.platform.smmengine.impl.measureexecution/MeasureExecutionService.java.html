@@ -1,0 +1,254 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="fr"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MeasureExecutionService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Measure Platform</a> &gt; <a href="index.source.html" class="el_package">org.measure.platform.smmengine.impl.measureexecution</a> &gt; <span class="el_source">MeasureExecutionService.java</span></div><h1>MeasureExecutionService.java</h1><pre class="source lang-java linenums">package org.measure.platform.smmengine.impl.measureexecution;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.inject.Inject;
+
+import org.measure.platform.core.api.IMeasureCatalogueService;
+import org.measure.platform.core.api.entitys.MeasureInstanceService;
+import org.measure.platform.core.api.entitys.MeasurePropertyService;
+import org.measure.platform.core.api.entitys.MeasureReferenceService;
+import org.measure.platform.core.entity.MeasureInstance;
+import org.measure.platform.core.entity.MeasureProperty;
+import org.measure.platform.core.entity.MeasureReference;
+import org.measure.platform.measurementstorage.api.IMeasurementStorage;
+import org.measure.platform.smmengine.api.ILoggerService;
+import org.measure.platform.smmengine.api.IMeasureExecutionService;
+import org.measure.smm.log.MeasureLog;
+import org.measure.smm.measure.api.IDerivedMeasure;
+import org.measure.smm.measure.api.IDirectMeasure;
+import org.measure.smm.measure.api.IMeasure;
+import org.measure.smm.measure.api.IMeasurement;
+import org.measure.smm.remote.RemoteExecutionResult;
+import org.measure.smm.remote.RemoteMeasureInstanceData;
+import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
+
+@Service
+<span class="nc" id="L32">public class MeasureExecutionService implements IMeasureExecutionService {</span>
+
+	@Inject
+	private IMeasureCatalogueService measureCatalogue;
+
+	@Inject
+	private MeasureInstanceService measureInstanceService;
+
+	@Inject
+	private MeasurePropertyService measurePropertyService;
+
+	@Inject
+	private MeasureReferenceService measureReferenceService;
+
+	@Inject
+	private IMeasurementStorage measurementStorage;
+
+	@Override
+	public MeasureLog executeMeasure(MeasureInstance measureData, IMeasure measureImpl) {
+
+<span class="nc" id="L52">		MeasureLog log = new MeasureLog();</span>
+<span class="nc" id="L53">		log.setExectionDate(new Date());</span>
+<span class="nc" id="L54">		log.setMeasureInstanceName(measureData.getInstanceName());</span>
+<span class="nc" id="L55">		log.setMeasureName(measureData.getMeasureName());</span>
+
+		try {
+<span class="nc bnc" id="L58" title="All 2 branches missed.">			if (measureData.isIsRemote()) {</span>
+<span class="nc" id="L59">				Map&lt;String, String&gt; updatedProperties = new HashMap&lt;&gt;();</span>
+<span class="nc" id="L60">				List&lt;IMeasurement&gt; measurements = executeRemoteMeasure(measureData, updatedProperties, log);</span>
+<span class="nc" id="L61">				storeUpdatedProperties(measureData, updatedProperties);</span>
+<span class="nc bnc" id="L62" title="All 2 branches missed.">				for (IMeasurement measurement : measurements) {</span>
+<span class="nc" id="L63">					measurementStorage.putMeasurement(measureData.getInstanceName(),</span>
+<span class="nc" id="L64">							measureData.isManageLastMeasurement(), measurement);</span>
+<span class="nc" id="L65">				}</span>
+
+<span class="nc" id="L67">			} else {</span>
+<span class="nc" id="L68">				List&lt;IMeasurement&gt; measurements = executeLocalMeasure(measureData, measureImpl, log);</span>
+<span class="nc bnc" id="L69" title="All 2 branches missed.">				for (IMeasurement measurement : measurements) {</span>
+<span class="nc" id="L70">					measurementStorage.putMeasurement(measureData.getInstanceName(),</span>
+<span class="nc" id="L71">							measureData.isManageLastMeasurement(), measurement);</span>
+<span class="nc" id="L72">				}</span>
+<span class="nc" id="L73">				storeUpdatedProperties(measureData, measureImpl.getUpdatedProperties());</span>
+
+			}
+<span class="nc" id="L76">		} catch (Exception e) {</span>
+
+<span class="nc" id="L78">			log.setExceptionMessage(e.getMessage());</span>
+<span class="nc" id="L79">			log.setSuccess(false);</span>
+<span class="nc" id="L80">		}</span>
+
+<span class="nc" id="L82">		return log;</span>
+	}
+
+	private HashMap&lt;String, String&gt; initialiseProperties(MeasureInstance measureData, MeasureLog log) {
+<span class="nc" id="L86">		HashMap&lt;String, String&gt; properties = new HashMap&lt;&gt;();</span>
+<span class="nc bnc" id="L87" title="All 2 branches missed.">		for (MeasureProperty property : measurePropertyService.findByInstance(measureData)) {</span>
+<span class="nc" id="L88">			properties.put(property.getPropertyName(), property.getPropertyValue());</span>
+<span class="nc bnc" id="L89" title="All 2 branches missed.">			if (log != null) {</span>
+<span class="nc" id="L90">				log.getParameters()</span>
+<span class="nc" id="L91">						.add(log.new MeasureTestParameters(property.getPropertyName(), property.getPropertyValue()));</span>
+			}
+<span class="nc" id="L93">		}</span>
+<span class="nc" id="L94">		return properties;</span>
+	}
+
+	private void storeUpdatedProperties(MeasureInstance measureData, Map&lt;String, String&gt; updatedProperties) {
+<span class="nc bnc" id="L98" title="All 2 branches missed.">		for (MeasureProperty property : new ArrayList&lt;&gt;(measurePropertyService.findByInstance(measureData))) {</span>
+<span class="nc" id="L99">			String updatedValue = updatedProperties.get(property.getPropertyName());</span>
+<span class="nc bnc" id="L100" title="All 2 branches missed.">			if (updatedValue != null) {</span>
+<span class="nc" id="L101">				property.setPropertyValue(updatedValue);</span>
+<span class="nc" id="L102">				measurePropertyService.save(property);</span>
+			}
+<span class="nc" id="L104">		}</span>
+
+<span class="nc" id="L106">	}</span>
+
+	@Override
+	public MeasureLog executeMeasure(Long measureInstanceId) {
+<span class="nc" id="L110">		MeasureInstance measureData = measureInstanceService.findOne(measureInstanceId);</span>
+<span class="nc" id="L111">		MeasureLog log = new MeasureLog();</span>
+
+<span class="nc" id="L113">		log.setExectionDate(new Date());</span>
+<span class="nc" id="L114">		log.setMeasureInstanceName(measureData.getInstanceName());</span>
+<span class="nc" id="L115">		log.setMeasureName(measureData.getMeasureName());</span>
+
+		try {
+
+<span class="nc bnc" id="L119" title="All 2 branches missed.">			if (measureData.isIsRemote()) {</span>
+<span class="nc" id="L120">				Map&lt;String, String&gt; updatedProperties = new HashMap&lt;&gt;();</span>
+<span class="nc" id="L121">				List&lt;IMeasurement&gt; measurements = executeRemoteMeasure(measureData,updatedProperties, log);</span>
+<span class="nc" id="L122">				storeUpdatedProperties(measureData, updatedProperties);</span>
+<span class="nc bnc" id="L123" title="All 2 branches missed.">				for (IMeasurement measurement : measurements) {</span>
+<span class="nc" id="L124">					measurementStorage.putMeasurement(measureData.getInstanceName(),</span>
+<span class="nc" id="L125">							measureData.isManageLastMeasurement(), measurement);</span>
+<span class="nc" id="L126">				}</span>
+<span class="nc" id="L127">			} else {</span>
+<span class="nc" id="L128">				IMeasure measureImpl = measureCatalogue.getMeasureImplementation(measureData.getMeasureName());</span>
+<span class="nc" id="L129">				List&lt;IMeasurement&gt; measurements = executeLocalMeasure(measureData, measureImpl, log);</span>
+<span class="nc" id="L130">				storeUpdatedProperties(measureData, measureImpl.getUpdatedProperties());</span>
+
+<span class="nc bnc" id="L132" title="All 2 branches missed.">				for (IMeasurement measurement : measurements) {</span>
+<span class="nc" id="L133">					measurementStorage.putMeasurement(measureData.getInstanceName(),</span>
+<span class="nc" id="L134">							measureData.isManageLastMeasurement(), measurement);</span>
+<span class="nc" id="L135">				}</span>
+			}
+
+<span class="nc" id="L138">		} catch (Exception e) {</span>
+
+<span class="nc" id="L140">			log.setExceptionMessage(e.getMessage());</span>
+<span class="nc" id="L141">			log.setSuccess(false);</span>
+<span class="nc" id="L142">		}</span>
+<span class="nc" id="L143">		return log;</span>
+	}
+
+	@Override
+	public MeasureLog testMeasure(Long measureInstanceId) {
+<span class="nc" id="L148">		MeasureInstance measureData = measureInstanceService.findOne(measureInstanceId);</span>
+<span class="nc" id="L149">		MeasureLog log = new MeasureLog();</span>
+
+<span class="nc" id="L151">		log.setExectionDate(new Date());</span>
+<span class="nc" id="L152">		log.setMeasureInstanceName(measureData.getInstanceName());</span>
+<span class="nc" id="L153">		log.setMeasureName(measureData.getMeasureName());</span>
+
+<span class="nc bnc" id="L155" title="All 2 branches missed.">		if (measureData.isIsRemote()) {</span>
+<span class="nc" id="L156">			executeRemoteMeasure(measureData, new HashMap&lt;String, String&gt;(), log);</span>
+		} else {
+<span class="nc" id="L158">			IMeasure measureImpl = measureCatalogue.getMeasureImplementation(measureData.getMeasureName());</span>
+<span class="nc" id="L159">			executeLocalMeasure(measureData, measureImpl, log);</span>
+		}
+<span class="nc" id="L161">		return log;</span>
+	}
+
+	private List&lt;IMeasurement&gt; executeRemoteMeasure(MeasureInstance measure, Map&lt;String, String&gt; updatedProperties,
+			MeasureLog log) {
+<span class="nc" id="L166">		RestTemplate restTemplate = new RestTemplate();</span>
+		try {
+
+<span class="nc" id="L169">			String url = &quot;http://&quot; + measure.getRemoteAdress() + &quot;/api/measure-agent/measure-execution&quot;;</span>
+
+<span class="nc" id="L171">			RemoteMeasureInstanceData data = new RemoteMeasureInstanceData();</span>
+<span class="nc" id="L172">			data.setInstanceName(measure.getInstanceName());</span>
+<span class="nc" id="L173">			data.setMeasureName(measure.getMeasureName());</span>
+<span class="nc" id="L174">			data.setProperties(initialiseProperties(measure, null));</span>
+
+<span class="nc" id="L176">			RemoteExecutionResult result = restTemplate.postForObject(url, data, RemoteExecutionResult.class);</span>
+
+<span class="nc bnc" id="L178" title="All 2 branches missed.">			if (result != null) {</span>
+<span class="nc" id="L179">				updatedProperties.putAll(result.getUpdatedProperties());</span>
+<span class="nc" id="L180">				log.setLog(result.getExecutionLog());</span>
+<span class="nc" id="L181">				return log.getMesurement();</span>
+			} else {
+<span class="nc" id="L183">				log.setSuccess(false);</span>
+<span class="nc" id="L184">				log.setExceptionMessage(&quot;No Result&quot;);</span>
+			}
+<span class="nc" id="L186">		} catch (Exception e) {</span>
+
+<span class="nc" id="L188">			log.setSuccess(false);</span>
+<span class="nc" id="L189">			log.setExceptionMessage(e.getMessage());</span>
+<span class="nc" id="L190">			System.out.println(&quot;Log1 &quot; + log.getExceptionMessage());</span>
+<span class="nc" id="L191">			e.printStackTrace();</span>
+<span class="nc" id="L192">		}</span>
+
+<span class="nc" id="L194">		return new ArrayList&lt;&gt;();</span>
+	}
+
+	private List&lt;IMeasurement&gt; executeLocalMeasure(MeasureInstance measure, IMeasure measureImpl, MeasureLog log) {
+		try {
+<span class="nc" id="L199">			measureImpl.setProperties(initialiseProperties(measure, log));</span>
+
+<span class="nc bnc" id="L201" title="All 2 branches missed.">			if (measureImpl instanceof IDirectMeasure) {</span>
+<span class="nc" id="L202">				Date start = new Date();</span>
+<span class="nc" id="L203">				List&lt;IMeasurement&gt; measurements = executeDirectMeasure((IDirectMeasure) measureImpl);</span>
+<span class="nc" id="L204">				log.setExecutionTime(new Date().getTime() - start.getTime());</span>
+<span class="nc" id="L205">				log.setMesurement(measurements);</span>
+<span class="nc" id="L206">				log.setSuccess(true);</span>
+<span class="nc" id="L207">				return measurements;</span>
+<span class="nc bnc" id="L208" title="All 2 branches missed.">			} else if (measureImpl instanceof IDerivedMeasure) {</span>
+
+<span class="nc" id="L210">				List&lt;MeasureReference&gt; references = new ArrayList&lt;&gt;();</span>
+<span class="nc bnc" id="L211" title="All 2 branches missed.">				for (MeasureReference reference : measureReferenceService.findByInstance(measure)) {</span>
+<span class="nc" id="L212">					references.add(reference);</span>
+<span class="nc" id="L213">				}</span>
+
+<span class="nc" id="L215">				Date start = new Date();</span>
+<span class="nc" id="L216">				List&lt;IMeasurement&gt; measurements = executeDerivedMeasure((IDerivedMeasure) measureImpl, references, log);</span>
+<span class="nc" id="L217">				log.setExecutionTime(new Date().getTime() - start.getTime());</span>
+<span class="nc" id="L218">				log.setMesurement(measurements);</span>
+<span class="nc" id="L219">				log.setSuccess(true);</span>
+<span class="nc" id="L220">				return measurements;</span>
+			}
+<span class="nc" id="L222">		} catch (Exception e) {</span>
+<span class="nc" id="L223">			log.setSuccess(false);</span>
+<span class="nc" id="L224">			log.setExceptionMessage(e.getMessage());</span>
+<span class="nc" id="L225">			e.printStackTrace();</span>
+<span class="nc" id="L226">		}</span>
+
+<span class="nc" id="L228">		return new ArrayList&lt;&gt;();</span>
+	}
+
+	private List&lt;IMeasurement&gt; executeDirectMeasure(IDirectMeasure directMeasure) throws Exception {
+<span class="nc" id="L232">		return directMeasure.getMeasurement();</span>
+	}
+
+	private List&lt;IMeasurement&gt; executeDerivedMeasure(IDerivedMeasure derivedMeasure, List&lt;MeasureReference&gt; references,
+			MeasureLog log) throws Exception {
+		// Get Input Measurements
+<span class="nc bnc" id="L238" title="All 2 branches missed.">		for (MeasureReference ref : references) {</span>
+<span class="nc" id="L239">			System.out.println(ref.getFilterExpression());</span>
+<span class="nc" id="L240">			List&lt;IMeasurement&gt; measurements = measurementStorage.getMeasurement(</span>
+<span class="nc" id="L241">					ref.getReferencedInstance().getInstanceName(), ref.getNumberRef(), ref.getFilterExpression());</span>
+<span class="nc bnc" id="L242" title="All 2 branches missed.">			for (IMeasurement measurement : measurements) {</span>
+<span class="nc" id="L243">				derivedMeasure.addMeasureInput(ref.getReferencedInstance().getInstanceName(), ref.getRole(),</span>
+						measurement);
+<span class="nc" id="L245">				log.getInputs().add(log.new MeasureTestInput(ref.getRole(), measurement));</span>
+<span class="nc" id="L246">			}</span>
+<span class="nc" id="L247">		}</span>
+
+		// Execute Measure
+<span class="nc" id="L250">		return derivedMeasure.calculateMeasurement();</span>
+	}
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.7.201606060606</span></div></body></html>

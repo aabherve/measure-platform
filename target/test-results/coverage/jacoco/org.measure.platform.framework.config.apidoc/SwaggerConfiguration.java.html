@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="fr"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>SwaggerConfiguration.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Measure Platform</a> &gt; <a href="index.source.html" class="el_package">org.measure.platform.framework.config.apidoc</a> &gt; <span class="el_source">SwaggerConfiguration.java</span></div><h1>SwaggerConfiguration.java</h1><pre class="source lang-java linenums">package org.measure.platform.framework.config.apidoc;
+
+import static springfox.documentation.builders.PathSelectors.regex;
+
+import java.util.Date;
+
+import org.measure.platform.framework.config.Constants;
+import org.measure.platform.framework.config.JHipsterProperties;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.Profile;
+import org.springframework.http.ResponseEntity;
+import org.springframework.util.StopWatch;
+
+import springfox.documentation.service.ApiInfo;
+import springfox.documentation.service.Contact;
+import springfox.documentation.spi.DocumentationType;
+import springfox.documentation.spring.web.plugins.Docket;
+import springfox.documentation.swagger2.annotations.EnableSwagger2;
+
+/**
+ * Springfox Swagger configuration.
+ *
+ * Warning! When having a lot of REST endpoints, Springfox can become a performance issue. In that
+ * case, you can use a specific Spring profile for this class, so that only front-end developers
+ * have access to the Swagger view.
+ */
+@Configuration
+@EnableSwagger2
+@Import(springfox.bean.validators.configuration.BeanValidatorPluginsConfiguration.class)
+@Profile(Constants.SPRING_PROFILE_SWAGGER)
+<span class="nc" id="L35">public class SwaggerConfiguration {</span>
+
+<span class="nc" id="L37">    private final Logger log = LoggerFactory.getLogger(SwaggerConfiguration.class);</span>
+
+    public static final String DEFAULT_INCLUDE_PATTERN = &quot;/api/.*&quot;;
+
+    /**
+     * Swagger Springfox configuration.
+     *
+     * @param jHipsterProperties the properties of the application
+     * @return the Swagger Springfox configuration
+     */
+    @Bean
+    public Docket swaggerSpringfoxDocket(JHipsterProperties jHipsterProperties) {
+<span class="nc" id="L49">        log.debug(&quot;Starting Swagger&quot;);</span>
+<span class="nc" id="L50">        StopWatch watch = new StopWatch();</span>
+<span class="nc" id="L51">        watch.start();</span>
+<span class="nc" id="L52">        Contact contact = new Contact(</span>
+<span class="nc" id="L53">            jHipsterProperties.getSwagger().getContactName(),</span>
+<span class="nc" id="L54">            jHipsterProperties.getSwagger().getContactUrl(),</span>
+<span class="nc" id="L55">            jHipsterProperties.getSwagger().getContactEmail());</span>
+
+<span class="nc" id="L57">        ApiInfo apiInfo = new ApiInfo(</span>
+<span class="nc" id="L58">            jHipsterProperties.getSwagger().getTitle(),</span>
+<span class="nc" id="L59">            jHipsterProperties.getSwagger().getDescription(),</span>
+<span class="nc" id="L60">            jHipsterProperties.getSwagger().getVersion(),</span>
+<span class="nc" id="L61">            jHipsterProperties.getSwagger().getTermsOfServiceUrl(),</span>
+            contact,
+<span class="nc" id="L63">            jHipsterProperties.getSwagger().getLicense(),</span>
+<span class="nc" id="L64">            jHipsterProperties.getSwagger().getLicenseUrl());</span>
+
+<span class="nc" id="L66">        Docket docket = new Docket(DocumentationType.SWAGGER_2)</span>
+<span class="nc" id="L67">            .apiInfo(apiInfo)</span>
+<span class="nc" id="L68">            .forCodeGeneration(true)</span>
+<span class="nc" id="L69">            .genericModelSubstitutes(ResponseEntity.class)</span>
+<span class="nc" id="L70">            .ignoredParameterTypes(java.sql.Date.class)</span>
+<span class="nc" id="L71">            .directModelSubstitute(java.time.LocalDate.class, java.sql.Date.class)</span>
+<span class="nc" id="L72">            .directModelSubstitute(java.time.ZonedDateTime.class, Date.class)</span>
+<span class="nc" id="L73">            .directModelSubstitute(java.time.LocalDateTime.class, Date.class)</span>
+<span class="nc" id="L74">            .select()</span>
+<span class="nc" id="L75">            .paths(regex(DEFAULT_INCLUDE_PATTERN))</span>
+<span class="nc" id="L76">            .build();</span>
+<span class="nc" id="L77">        watch.stop();</span>
+<span class="nc" id="L78">        log.debug(&quot;Started Swagger in {} ms&quot;, watch.getTotalTimeMillis());</span>
+<span class="nc" id="L79">        return docket;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.7.201606060606</span></div></body></html>

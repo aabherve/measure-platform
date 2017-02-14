@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="fr"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MeasureReference.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Measure Platform</a> &gt; <a href="index.source.html" class="el_package">org.measure.platform.core.entity</a> &gt; <span class="el_source">MeasureReference.java</span></div><h1>MeasureReference.java</h1><pre class="source lang-java linenums">package org.measure.platform.core.entity;
+
+import java.io.Serializable;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+
+/**
+ * A MeasureProperty.
+ */
+@Entity
+@Table(name = &quot;measure_reference&quot;)
+@Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
+<span class="nc" id="L22">public class MeasureReference implements Serializable {</span>
+
+	private static final long serialVersionUID = 1L;
+
+	@Id
+	@GeneratedValue(strategy = GenerationType.AUTO)
+	private Long id;
+
+	private Integer numberRef;
+	
+	private String role;
+		
+	@Column(name = &quot;filter_expression&quot;)
+	private String filterExpression;
+
+	@ManyToOne
+	private MeasureInstance ownerInstance;
+	
+	
+	@ManyToOne
+	private MeasureInstance referencedInstance;
+	
+	
+    public Long getId() {
+<span class="nc" id="L46">        return id;</span>
+    }
+
+    public void setId(Long id) {
+<span class="nc" id="L50">        this.id = id;</span>
+<span class="nc" id="L51">    }</span>
+    
+    public Integer getNumberRef() {
+<span class="nc" id="L54">        return numberRef;</span>
+    }
+
+    public MeasureReference numberRef(Integer numberRef) {
+<span class="nc" id="L58">        this.numberRef = numberRef;</span>
+<span class="nc" id="L59">        return this;</span>
+    }
+
+    public void setNumberRef(Integer numberRef) {
+<span class="nc" id="L63">        this.numberRef = numberRef;</span>
+<span class="nc" id="L64">    }</span>
+    
+
+
+	public String getRole() {
+<span class="nc" id="L69">        return role;</span>
+    }
+
+    public MeasureReference role(String role) {
+<span class="nc" id="L73">        this.role = role;</span>
+<span class="nc" id="L74">        return this;</span>
+    }
+
+    public void setRole(String role) {
+<span class="nc" id="L78">        this.role = role;</span>
+<span class="nc" id="L79">    }</span>
+    
+	public String getFilterExpression() {
+<span class="nc" id="L82">        return filterExpression;</span>
+    }
+
+    public MeasureReference filterExpression(String filterExpression) {
+<span class="nc" id="L86">        this.filterExpression = filterExpression;</span>
+<span class="nc" id="L87">        return this;</span>
+    }
+
+    public void setFilterExpression(String filterExpression) {
+<span class="nc" id="L91">        this.filterExpression = filterExpression;</span>
+<span class="nc" id="L92">    }</span>
+    
+    public MeasureInstance getOwnerInstance() {
+<span class="nc" id="L95">        return ownerInstance;</span>
+    }
+
+    public MeasureReference ownerInstance(MeasureInstance ownerInstance) {
+<span class="nc" id="L99">        this.ownerInstance = ownerInstance;</span>
+<span class="nc" id="L100">        return this;</span>
+    }
+
+    public void setOwnerInstance(MeasureInstance ownerInstance) {
+<span class="nc" id="L104">        this.ownerInstance = ownerInstance;</span>
+<span class="nc" id="L105">    }</span>
+
+    public MeasureInstance getReferencedInstance() {
+<span class="nc" id="L108">        return referencedInstance;</span>
+    }
+
+    public MeasureReference measureInstance(MeasureInstance referencedInstance) {
+<span class="nc" id="L112">        this.referencedInstance = referencedInstance;</span>
+<span class="nc" id="L113">        return this;</span>
+    }
+
+    public void setReferencedInstance(MeasureInstance referencedInstance) {
+<span class="nc" id="L117">        this.referencedInstance = referencedInstance;</span>
+<span class="nc" id="L118">    }</span>
+
+	@Override
+	public String toString() {
+<span class="nc" id="L122">		return &quot;MeasureReference{&quot; + &quot;id=&quot; + id + '}';</span>
+	}
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.7.201606060606</span></div></body></html>

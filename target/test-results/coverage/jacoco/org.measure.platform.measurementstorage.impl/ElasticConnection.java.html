@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="fr"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ElasticConnection.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Measure Platform</a> &gt; <a href="index.source.html" class="el_package">org.measure.platform.measurementstorage.impl</a> &gt; <span class="el_source">ElasticConnection.java</span></div><h1>ElasticConnection.java</h1><pre class="source lang-java linenums">package org.measure.platform.measurementstorage.impl;
+
+import java.net.InetAddress;
+
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
+
+import org.elasticsearch.client.transport.TransportClient;
+import org.elasticsearch.common.settings.Settings;
+import org.elasticsearch.common.transport.InetSocketTransportAddress;
+import org.elasticsearch.transport.client.PreBuiltTransportClient;
+import org.springframework.context.annotation.Configuration;
+
+@Configuration
+<span class="nc" id="L15">public class ElasticConnection {</span>
+	
+	private TransportClient client;
+	
+	@PostConstruct
+	public void initIt() throws Exception {
+<span class="nc" id="L21">		Settings settings = Settings.builder() .put(&quot;cluster.name&quot;, &quot;elasticsearch&quot;).build();</span>
+<span class="nc" id="L22">		this.client = new PreBuiltTransportClient(settings).addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName(&quot;127.0.0.1&quot;), 9300));</span>
+<span class="nc" id="L23">	}</span>
+
+	@PreDestroy
+	public void cleanUp() throws Exception {
+<span class="nc" id="L27">		this.client.close();</span>
+<span class="nc" id="L28">	}</span>
+	
+	public synchronized TransportClient getClient(){
+<span class="nc" id="L31">		return client;</span>
+	}
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.7.201606060606</span></div></body></html>

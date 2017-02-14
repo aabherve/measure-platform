@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="fr"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>WebConfigurer.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Measure Platform</a> &gt; <a href="index.source.html" class="el_package">org.measure.platform.framework.config</a> &gt; <span class="el_source">WebConfigurer.java</span></div><h1>WebConfigurer.java</h1><pre class="source lang-java linenums">package org.measure.platform.framework.config;
+
+import java.io.File;
+import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.EnumSet;
+
+import javax.inject.Inject;
+
+import org.measure.platform.restapi.framework.filter.CachingHttpHeadersFilter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.context.embedded.ConfigurableEmbeddedServletContainer;
+import org.springframework.boot.context.embedded.EmbeddedServletContainerCustomizer;
+import org.springframework.boot.context.embedded.MimeMappings;
+import org.springframework.boot.web.servlet.ServletContextInitializer;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.filter.CorsFilter;
+
+import com.codahale.metrics.MetricRegistry;
+import com.codahale.metrics.servlet.InstrumentedFilter;
+import com.codahale.metrics.servlets.MetricsServlet;
+import javax.servlet.*;
+
+/**
+ * Configuration of web application with Servlet 3.0 APIs.
+ */
+@Configuration
+<span class="nc" id="L35">public class WebConfigurer implements ServletContextInitializer, EmbeddedServletContainerCustomizer {</span>
+
+<span class="nc" id="L37">    private final Logger log = LoggerFactory.getLogger(WebConfigurer.class);</span>
+
+    @Inject
+    private Environment env;
+
+    @Inject
+    private JHipsterProperties jHipsterProperties;
+
+    @Autowired(required = false)
+    private MetricRegistry metricRegistry;
+
+    @Override
+    public void onStartup(ServletContext servletContext) throws ServletException {
+<span class="nc bnc" id="L50" title="All 2 branches missed.">        if (env.getActiveProfiles().length != 0) {</span>
+<span class="nc" id="L51">            log.info(&quot;Web application configuration, using profiles: {}&quot;, Arrays.toString(env.getActiveProfiles()));</span>
+        }
+<span class="nc" id="L53">        EnumSet&lt;DispatcherType&gt; disps = EnumSet.of(DispatcherType.REQUEST, DispatcherType.FORWARD, DispatcherType.ASYNC);</span>
+<span class="nc" id="L54">        initMetrics(servletContext, disps);</span>
+<span class="nc bnc" id="L55" title="All 2 branches missed.">        if (env.acceptsProfiles(Constants.SPRING_PROFILE_PRODUCTION)) {</span>
+<span class="nc" id="L56">            initCachingHttpHeadersFilter(servletContext, disps);</span>
+        }
+<span class="nc" id="L58">        log.info(&quot;Web application fully configured&quot;);</span>
+<span class="nc" id="L59">    }</span>
+
+    /**
+     * Customize the Servlet engine: Mime types, the document root, the cache.
+     */
+    @Override
+    public void customize(ConfigurableEmbeddedServletContainer container) {
+<span class="nc" id="L66">        MimeMappings mappings = new MimeMappings(MimeMappings.DEFAULT);</span>
+        // IE issue, see https://github.com/jhipster/generator-jhipster/pull/711
+<span class="nc" id="L68">        mappings.add(&quot;html&quot;, &quot;text/html;charset=utf-8&quot;);</span>
+        // CloudFoundry issue, see https://github.com/cloudfoundry/gorouter/issues/64
+<span class="nc" id="L70">        mappings.add(&quot;json&quot;, &quot;text/html;charset=utf-8&quot;);</span>
+<span class="nc" id="L71">        container.setMimeMappings(mappings);</span>
+        // When running in an IDE or with ./mvnw spring-boot:run, set location of the static web assets.
+<span class="nc" id="L73">        setLocationForStaticAssets(container);</span>
+<span class="nc" id="L74">    }</span>
+
+    private void setLocationForStaticAssets(ConfigurableEmbeddedServletContainer container) {
+        File root;
+<span class="nc" id="L78">        String prefixPath = resolvePathPrefix();</span>
+<span class="nc bnc" id="L79" title="All 2 branches missed.">        if (env.acceptsProfiles(Constants.SPRING_PROFILE_PRODUCTION)) {</span>
+<span class="nc" id="L80">            root = new File(prefixPath + &quot;target/www/&quot;);</span>
+        } else {
+<span class="nc" id="L82">            root = new File(prefixPath + &quot;src/main/webapp/&quot;);</span>
+        }
+<span class="nc bnc" id="L84" title="All 4 branches missed.">        if (root.exists() &amp;&amp; root.isDirectory()) {</span>
+<span class="nc" id="L85">            container.setDocumentRoot(root);</span>
+        }
+<span class="nc" id="L87">    }</span>
+
+    /**
+     *  Resolve path prefix to static resources.
+     */
+    private String resolvePathPrefix() {
+<span class="nc" id="L93">        String fullExecutablePath = this.getClass().getResource(&quot;&quot;).getPath();</span>
+<span class="nc" id="L94">        String rootPath = Paths.get(&quot;.&quot;).toUri().normalize().getPath();</span>
+<span class="nc" id="L95">        String extractedPath = fullExecutablePath.replace(rootPath, &quot;&quot;);</span>
+<span class="nc" id="L96">        int extractionEndIndex = extractedPath.indexOf(&quot;target/&quot;);</span>
+<span class="nc bnc" id="L97" title="All 2 branches missed.">        if(extractionEndIndex &lt;= 0) {</span>
+<span class="nc" id="L98">            return &quot;&quot;;</span>
+        }
+<span class="nc" id="L100">        return extractedPath.substring(0, extractionEndIndex);</span>
+    }
+
+    /**
+     * Initializes the caching HTTP Headers Filter.
+     */
+    private void initCachingHttpHeadersFilter(ServletContext servletContext,
+                                              EnumSet&lt;DispatcherType&gt; disps) {
+<span class="nc" id="L108">        log.debug(&quot;Registering Caching HTTP Headers Filter&quot;);</span>
+<span class="nc" id="L109">        FilterRegistration.Dynamic cachingHttpHeadersFilter =</span>
+<span class="nc" id="L110">            servletContext.addFilter(&quot;cachingHttpHeadersFilter&quot;,</span>
+                new CachingHttpHeadersFilter(jHipsterProperties));
+
+<span class="nc" id="L113">        cachingHttpHeadersFilter.addMappingForUrlPatterns(disps, true, &quot;/content/*&quot;);</span>
+<span class="nc" id="L114">        cachingHttpHeadersFilter.addMappingForUrlPatterns(disps, true, &quot;/app/*&quot;);</span>
+<span class="nc" id="L115">        cachingHttpHeadersFilter.setAsyncSupported(true);</span>
+<span class="nc" id="L116">    }</span>
+
+    /**
+     * Initializes Metrics.
+     */
+    private void initMetrics(ServletContext servletContext, EnumSet&lt;DispatcherType&gt; disps) {
+<span class="nc" id="L122">        log.debug(&quot;Initializing Metrics registries&quot;);</span>
+<span class="nc" id="L123">        servletContext.setAttribute(InstrumentedFilter.REGISTRY_ATTRIBUTE,</span>
+            metricRegistry);
+<span class="nc" id="L125">        servletContext.setAttribute(MetricsServlet.METRICS_REGISTRY,</span>
+            metricRegistry);
+
+<span class="nc" id="L128">        log.debug(&quot;Registering Metrics Filter&quot;);</span>
+<span class="nc" id="L129">        FilterRegistration.Dynamic metricsFilter = servletContext.addFilter(&quot;webappMetricsFilter&quot;,</span>
+            new InstrumentedFilter());
+
+<span class="nc" id="L132">        metricsFilter.addMappingForUrlPatterns(disps, true, &quot;/*&quot;);</span>
+<span class="nc" id="L133">        metricsFilter.setAsyncSupported(true);</span>
+
+<span class="nc" id="L135">        log.debug(&quot;Registering Metrics Servlet&quot;);</span>
+<span class="nc" id="L136">        ServletRegistration.Dynamic metricsAdminServlet =</span>
+<span class="nc" id="L137">            servletContext.addServlet(&quot;metricsServlet&quot;, new MetricsServlet());</span>
+
+<span class="nc" id="L139">        metricsAdminServlet.addMapping(&quot;/management/jhipster/metrics/*&quot;);</span>
+<span class="nc" id="L140">        metricsAdminServlet.setAsyncSupported(true);</span>
+<span class="nc" id="L141">        metricsAdminServlet.setLoadOnStartup(2);</span>
+<span class="nc" id="L142">    }</span>
+
+    @Bean
+    @ConditionalOnProperty(name = &quot;jhipster.cors.allowed-origins&quot;)
+    public CorsFilter corsFilter() {
+<span class="nc" id="L147">        log.debug(&quot;Registering CORS filter&quot;);</span>
+<span class="nc" id="L148">        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();</span>
+<span class="nc" id="L149">        CorsConfiguration config = jHipsterProperties.getCors();</span>
+<span class="nc" id="L150">        source.registerCorsConfiguration(&quot;/api/**&quot;, config);</span>
+<span class="nc" id="L151">        source.registerCorsConfiguration(&quot;/v2/api-docs&quot;, config);</span>
+<span class="nc" id="L152">        source.registerCorsConfiguration(&quot;/oauth/**&quot;, config);</span>
+<span class="nc" id="L153">        return new CorsFilter(source);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.7.201606060606</span></div></body></html>

@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="fr"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>DatabaseConfiguration.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Measure Platform</a> &gt; <a href="index.source.html" class="el_package">org.measure.platform.framework.config</a> &gt; <span class="el_source">DatabaseConfiguration.java</span></div><h1>DatabaseConfiguration.java</h1><pre class="source lang-java linenums">package org.measure.platform.framework.config;
+
+import javax.inject.Inject;
+import javax.sql.DataSource;
+
+import org.measure.platform.framework.config.liquibase.AsyncSpringLiquibase;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.boot.autoconfigure.liquibase.LiquibaseProperties;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
+import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
+
+import com.fasterxml.jackson.datatype.hibernate4.Hibernate4Module;
+
+import liquibase.integration.spring.SpringLiquibase;
+
+@Configuration
+@EnableJpaRepositories(&quot;org.measure.platform.core.impl.repository&quot;)
+@EnableJpaAuditing(auditorAwareRef = &quot;springSecurityAuditorAware&quot;)
+@EnableTransactionManagement
+<span class="fc" id="L25">public class DatabaseConfiguration {</span>
+
+<span class="fc" id="L27">    private final Logger log = LoggerFactory.getLogger(DatabaseConfiguration.class);</span>
+
+    @Inject
+    private Environment env;
+
+    @Bean
+    public SpringLiquibase liquibase(DataSource dataSource, LiquibaseProperties liquibaseProperties) {
+
+        // Use liquibase.integration.spring.SpringLiquibase if you don't want Liquibase to start asynchronously
+<span class="fc" id="L36">        SpringLiquibase liquibase = new AsyncSpringLiquibase();</span>
+<span class="fc" id="L37">        liquibase.setDataSource(dataSource);</span>
+<span class="fc" id="L38">        liquibase.setChangeLog(&quot;classpath:config/liquibase/master.xml&quot;);</span>
+<span class="fc" id="L39">        liquibase.setContexts(liquibaseProperties.getContexts());</span>
+<span class="fc" id="L40">        liquibase.setDefaultSchema(liquibaseProperties.getDefaultSchema());</span>
+<span class="fc" id="L41">        liquibase.setDropFirst(liquibaseProperties.isDropFirst());</span>
+<span class="pc bpc" id="L42" title="1 of 2 branches missed.">        if (env.acceptsProfiles(Constants.SPRING_PROFILE_NO_LIQUIBASE)) {</span>
+<span class="nc" id="L43">            liquibase.setShouldRun(false);</span>
+        } else {
+<span class="fc" id="L45">            liquibase.setShouldRun(liquibaseProperties.isEnabled());</span>
+<span class="fc" id="L46">            log.debug(&quot;Configuring Liquibase&quot;);</span>
+        }
+<span class="fc" id="L48">        return liquibase;</span>
+    }
+
+    @Bean
+    public Hibernate4Module hibernate4Module() {
+<span class="nc" id="L53">        return new Hibernate4Module();</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.7.201606060606</span></div></body></html>

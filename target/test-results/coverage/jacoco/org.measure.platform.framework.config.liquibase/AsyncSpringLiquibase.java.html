@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="fr"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AsyncSpringLiquibase.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Measure Platform</a> &gt; <a href="index.source.html" class="el_package">org.measure.platform.framework.config.liquibase</a> &gt; <span class="el_source">AsyncSpringLiquibase.java</span></div><h1>AsyncSpringLiquibase.java</h1><pre class="source lang-java linenums">package org.measure.platform.framework.config.liquibase;
+
+import javax.inject.Inject;
+
+import org.measure.platform.framework.config.Constants;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.core.env.Environment;
+import org.springframework.core.task.TaskExecutor;
+import org.springframework.util.StopWatch;
+
+import liquibase.exception.LiquibaseException;
+import liquibase.integration.spring.SpringLiquibase;
+
+/**
+ * Specific liquibase.integration.spring.SpringLiquibase that will update the database asynchronously.
+ * &lt;p&gt;
+ *     By default, this asynchronous version only works when using the &quot;dev&quot; profile.&lt;p&gt;
+ *     The standard liquibase.integration.spring.SpringLiquibase starts Liquibase in the current thread:
+ *     &lt;ul&gt;
+ *         &lt;li&gt;This is needed if you want to do some database requests at startup&lt;/li&gt;
+ *         &lt;li&gt;This ensure that the database is ready when the application starts&lt;/li&gt;
+ *     &lt;/ul&gt;
+ *     But as this is a rather slow process, we use this asynchronous version to speed up our start-up time:
+ *     &lt;ul&gt;
+ *         &lt;li&gt;On a recent MacBook Pro, start-up time is down from 14 seconds to 8 seconds&lt;/li&gt;
+ *         &lt;li&gt;In production, this can help your application run on platforms like Heroku, where it must start/restart very quickly&lt;/li&gt;
+ *     &lt;/ul&gt;
+ */
+<span class="fc" id="L31">public class AsyncSpringLiquibase extends SpringLiquibase {</span>
+
+    // named &quot;logger&quot; because there is already a field called &quot;log&quot; in &quot;SpringLiquibase&quot;
+<span class="fc" id="L34">    private final Logger logger = LoggerFactory.getLogger(AsyncSpringLiquibase.class);</span>
+
+    @Inject
+    @Qualifier(&quot;taskExecutor&quot;)
+    private TaskExecutor taskExecutor;
+
+    @Inject
+    private Environment env;
+
+    @Override
+    public void afterPropertiesSet() throws LiquibaseException {
+<span class="pc bpc" id="L45" title="1 of 2 branches missed.">        if (!env.acceptsProfiles(Constants.SPRING_PROFILE_NO_LIQUIBASE)) {</span>
+<span class="pc bpc" id="L46" title="1 of 2 branches missed.">            if (env.acceptsProfiles(Constants.SPRING_PROFILE_DEVELOPMENT, Constants.SPRING_PROFILE_HEROKU)) {</span>
+<span class="nc" id="L47">                taskExecutor.execute(() -&gt; {</span>
+                    try {
+<span class="nc" id="L49">                        logger.warn(&quot;Starting Liquibase asynchronously, your database might not be ready at startup!&quot;);</span>
+<span class="nc" id="L50">                        initDb();</span>
+<span class="nc" id="L51">                    } catch (LiquibaseException e) {</span>
+<span class="nc" id="L52">                        logger.error(&quot;Liquibase could not start correctly, your database is NOT ready: {}&quot;, e.getMessage(), e);</span>
+<span class="nc" id="L53">                    }</span>
+<span class="nc" id="L54">                });</span>
+            } else {
+<span class="fc" id="L56">                logger.debug(&quot;Starting Liquibase synchronously&quot;);</span>
+<span class="fc" id="L57">                initDb();</span>
+            }
+        } else {
+<span class="nc" id="L60">            logger.debug(&quot;Liquibase is disabled&quot;);</span>
+        }
+<span class="fc" id="L62">    }</span>
+
+    protected void initDb() throws LiquibaseException {
+<span class="fc" id="L65">        StopWatch watch = new StopWatch();</span>
+<span class="fc" id="L66">        watch.start();</span>
+<span class="fc" id="L67">        super.afterPropertiesSet();</span>
+<span class="fc" id="L68">        watch.stop();</span>
+<span class="fc" id="L69">        logger.debug(&quot;Started Liquibase in {} ms&quot;, watch.getTotalTimeMillis());</span>
+<span class="fc" id="L70">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.7.201606060606</span></div></body></html>

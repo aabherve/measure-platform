@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="fr"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>LocaleConfiguration.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Measure Platform</a> &gt; <a href="index.source.html" class="el_package">org.measure.platform.framework.config</a> &gt; <span class="el_source">LocaleConfiguration.java</span></div><h1>LocaleConfiguration.java</h1><pre class="source lang-java linenums">package org.measure.platform.framework.config;
+
+import org.measure.platform.framework.config.locale.AngularCookieLocaleResolver;
+import org.springframework.boot.bind.RelaxedPropertyResolver;
+import org.springframework.context.EnvironmentAware;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
+import org.springframework.web.servlet.LocaleResolver;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
+import org.springframework.web.servlet.i18n.LocaleChangeInterceptor;
+
+@Configuration
+<span class="nc" id="L15">public class LocaleConfiguration extends WebMvcConfigurerAdapter implements EnvironmentAware {</span>
+
+    @SuppressWarnings(&quot;unused&quot;)
+    private RelaxedPropertyResolver propertyResolver;
+
+    @Override
+    public void setEnvironment(Environment environment) {
+<span class="nc" id="L22">        this.propertyResolver = new RelaxedPropertyResolver(environment, &quot;spring.messages.&quot;);</span>
+<span class="nc" id="L23">    }</span>
+
+    @Bean(name = &quot;localeResolver&quot;)
+    public LocaleResolver localeResolver() {
+<span class="nc" id="L27">        AngularCookieLocaleResolver cookieLocaleResolver = new AngularCookieLocaleResolver();</span>
+<span class="nc" id="L28">        cookieLocaleResolver.setCookieName(&quot;NG_TRANSLATE_LANG_KEY&quot;);</span>
+<span class="nc" id="L29">        return cookieLocaleResolver;</span>
+    }
+
+    @Override
+    public void addInterceptors(InterceptorRegistry registry) {
+<span class="nc" id="L34">        LocaleChangeInterceptor localeChangeInterceptor = new LocaleChangeInterceptor();</span>
+<span class="nc" id="L35">        localeChangeInterceptor.setParamName(&quot;language&quot;);</span>
+<span class="nc" id="L36">        registry.addInterceptor(localeChangeInterceptor);</span>
+<span class="nc" id="L37">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.7.201606060606</span></div></body></html>

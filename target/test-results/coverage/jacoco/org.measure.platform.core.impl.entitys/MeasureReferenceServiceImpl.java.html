@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="fr"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MeasureReferenceServiceImpl.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Measure Platform</a> &gt; <a href="index.source.html" class="el_package">org.measure.platform.core.impl.entitys</a> &gt; <span class="el_source">MeasureReferenceServiceImpl.java</span></div><h1>MeasureReferenceServiceImpl.java</h1><pre class="source lang-java linenums">package org.measure.platform.core.impl.entitys;
+
+import java.util.List;
+
+import javax.inject.Inject;
+
+import org.measure.platform.core.api.entitys.MeasureReferenceService;
+import org.measure.platform.core.entity.MeasureInstance;
+import org.measure.platform.core.entity.MeasureReference;
+import org.measure.platform.core.impl.repository.MeasureReferenceRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+/**
+ * Service Implementation for managing MeasureReference.
+ */
+@Service
+@Transactional
+<span class="nc" id="L21">public class MeasureReferenceServiceImpl implements MeasureReferenceService{</span>
+
+<span class="nc" id="L23">    private final Logger log = LoggerFactory.getLogger(MeasureReferenceServiceImpl.class);</span>
+    
+    @Inject
+    private MeasureReferenceRepository measureReferenceRepository;
+
+    /**
+     * Save a MeasureReference.
+     *
+     * @param MeasureReference the entity to save
+     * @return the persisted entity
+     */
+    public MeasureReference save(MeasureReference MeasureReference) {
+<span class="nc" id="L35">        log.debug(&quot;Request to save MeasureReference : {}&quot;, MeasureReference);</span>
+<span class="nc" id="L36">        MeasureReference result = measureReferenceRepository.save(MeasureReference);</span>
+<span class="nc" id="L37">        return result;</span>
+    }
+
+    /**
+     *  Get all the measureProperties.
+     *  
+     *  @return the list of entities
+     */
+    @Transactional(readOnly = true) 
+    public List&lt;MeasureReference&gt; findAll() {
+<span class="nc" id="L47">        log.debug(&quot;Request to get all MeasureProperties&quot;);</span>
+<span class="nc" id="L48">        List&lt;MeasureReference&gt; result = measureReferenceRepository.findAll();</span>
+
+<span class="nc" id="L50">        return result;</span>
+    }
+
+    /**
+     *  Get one MeasureReference by id.
+     *
+     *  @param id the id of the entity
+     *  @return the entity
+     */
+    @Transactional(readOnly = true) 
+    public MeasureReference findOne(Long id) {
+<span class="nc" id="L61">        log.debug(&quot;Request to get MeasureReference : {}&quot;, id);</span>
+<span class="nc" id="L62">        MeasureReference MeasureReference = measureReferenceRepository.findOne(id);</span>
+<span class="nc" id="L63">        return MeasureReference;</span>
+    }
+
+    /**
+     *  Delete the  MeasureReference by id.
+     *
+     *  @param id the id of the entity
+     */
+    public void delete(Long id) {
+<span class="nc" id="L72">        log.debug(&quot;Request to delete MeasureReference : {}&quot;, id);</span>
+<span class="nc" id="L73">        measureReferenceRepository.delete(id);</span>
+<span class="nc" id="L74">    }</span>
+
+	@Override
+	public List&lt;MeasureReference&gt; findByInstance(MeasureInstance instance) {
+<span class="nc" id="L78">		List&lt;MeasureReference&gt; result = measureReferenceRepository.findByMeasure(instance);</span>
+<span class="nc" id="L79">        return result;</span>
+	}
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.7.201606060606</span></div></body></html>

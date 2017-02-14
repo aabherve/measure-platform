@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="fr"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AngularCookieLocaleResolver.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Measure Platform</a> &gt; <a href="index.source.html" class="el_package">org.measure.platform.framework.config.locale</a> &gt; <span class="el_source">AngularCookieLocaleResolver.java</span></div><h1>AngularCookieLocaleResolver.java</h1><pre class="source lang-java linenums">package org.measure.platform.framework.config.locale;
+
+import java.util.Locale;
+import java.util.TimeZone;
+
+import org.springframework.context.i18n.LocaleContext;
+import org.springframework.context.i18n.TimeZoneAwareLocaleContext;
+import org.springframework.util.StringUtils;
+import org.springframework.web.servlet.i18n.CookieLocaleResolver;
+import org.springframework.web.util.WebUtils;
+import javax.servlet.http.*;
+
+
+/**
+ * Angular cookie saved the locale with a double quote (%22en%22).
+ * So the default CookieLocaleResolver#StringUtils.parseLocaleString(localePart)
+ * is not able to parse the locale.
+ *
+ * This class will check if a double quote has been added, if so it will remove it.
+ */
+
+
+
+<span class="nc" id="L24">public class AngularCookieLocaleResolver extends CookieLocaleResolver {</span>
+
+    @Override
+    public Locale resolveLocale(HttpServletRequest request) {
+<span class="nc" id="L28">        parseLocaleCookieIfNecessary(request);</span>
+<span class="nc" id="L29">        return (Locale) request.getAttribute(LOCALE_REQUEST_ATTRIBUTE_NAME);</span>
+    }
+
+    @Override
+    public LocaleContext resolveLocaleContext(final HttpServletRequest request) {
+<span class="nc" id="L34">        parseLocaleCookieIfNecessary(request);</span>
+<span class="nc" id="L35">        return new TimeZoneAwareLocaleContext() {</span>
+            @Override
+            public Locale getLocale() {
+<span class="nc" id="L38">                return (Locale) request.getAttribute(LOCALE_REQUEST_ATTRIBUTE_NAME);</span>
+            }
+
+            @Override
+            public TimeZone getTimeZone() {
+<span class="nc" id="L43">                return (TimeZone) request.getAttribute(TIME_ZONE_REQUEST_ATTRIBUTE_NAME);</span>
+            }
+        };
+    }
+
+    @Override
+    public void addCookie(HttpServletResponse response, String cookieValue) {
+        // Mandatory cookie modification for AngularJS to support the locale switching on the server side.
+<span class="nc" id="L51">        super.addCookie(response, &quot;%22&quot; + cookieValue + &quot;%22&quot;);</span>
+<span class="nc" id="L52">    }</span>
+
+    private void parseLocaleCookieIfNecessary(HttpServletRequest request) {
+<span class="nc bnc" id="L55" title="All 2 branches missed.">        if (request.getAttribute(LOCALE_REQUEST_ATTRIBUTE_NAME) == null) {</span>
+            // Retrieve and parse cookie value.
+<span class="nc" id="L57">            Cookie cookie = WebUtils.getCookie(request, getCookieName());</span>
+<span class="nc" id="L58">            Locale locale = null;</span>
+<span class="nc" id="L59">            TimeZone timeZone = null;</span>
+<span class="nc bnc" id="L60" title="All 2 branches missed.">            if (cookie != null) {</span>
+<span class="nc" id="L61">                String value = cookie.getValue();</span>
+
+                // Remove the double quote
+<span class="nc" id="L64">                value = StringUtils.replace(value, &quot;%22&quot;, &quot;&quot;);</span>
+
+<span class="nc" id="L66">                String localePart = value;</span>
+<span class="nc" id="L67">                String timeZonePart = null;</span>
+<span class="nc" id="L68">                int spaceIndex = localePart.indexOf(' ');</span>
+<span class="nc bnc" id="L69" title="All 2 branches missed.">                if (spaceIndex != -1) {</span>
+<span class="nc" id="L70">                    localePart = value.substring(0, spaceIndex);</span>
+<span class="nc" id="L71">                    timeZonePart = value.substring(spaceIndex + 1);</span>
+                }
+<span class="nc bnc" id="L73" title="All 2 branches missed.">                locale = (!&quot;-&quot;.equals(localePart) ? StringUtils.parseLocaleString(localePart.replace('-', '_')) : null);</span>
+<span class="nc bnc" id="L74" title="All 2 branches missed.">                if (timeZonePart != null) {</span>
+<span class="nc" id="L75">                    timeZone = StringUtils.parseTimeZoneString(timeZonePart);</span>
+                }
+<span class="nc bnc" id="L77" title="All 2 branches missed.">                if (logger.isTraceEnabled()) {</span>
+<span class="nc bnc" id="L78" title="All 2 branches missed.">                    logger.trace(&quot;Parsed cookie value [&quot; + cookie.getValue() + &quot;] into locale '&quot; + locale +</span>
+<span class="nc" id="L79">                        &quot;'&quot; + (timeZone != null ? &quot; and time zone '&quot; + timeZone.getID() + &quot;'&quot; : &quot;&quot;));</span>
+                }
+            }
+<span class="nc bnc" id="L82" title="All 2 branches missed.">            request.setAttribute(LOCALE_REQUEST_ATTRIBUTE_NAME,</span>
+<span class="nc" id="L83">                (locale != null ? locale: determineDefaultLocale(request)));</span>
+
+<span class="nc bnc" id="L85" title="All 2 branches missed.">            request.setAttribute(TIME_ZONE_REQUEST_ATTRIBUTE_NAME,</span>
+<span class="nc" id="L86">                (timeZone != null ? timeZone : determineDefaultTimeZone(request)));</span>
+        }
+<span class="nc" id="L88">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.7.201606060606</span></div></body></html>

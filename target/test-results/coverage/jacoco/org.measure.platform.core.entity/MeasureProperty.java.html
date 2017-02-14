@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="fr"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MeasureProperty.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Measure Platform</a> &gt; <a href="index.source.html" class="el_package">org.measure.platform.core.entity</a> &gt; <span class="el_source">MeasureProperty.java</span></div><h1>MeasureProperty.java</h1><pre class="source lang-java linenums">package org.measure.platform.core.entity;
+
+import java.io.Serializable;
+import java.util.Objects;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
+
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+
+/**
+ * A MeasureProperty.
+ */
+@Entity
+@Table(name = &quot;measure_property&quot;)
+@Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
+<span class="nc" id="L24">public class MeasureProperty implements Serializable {</span>
+
+    private static final long serialVersionUID = 1L;
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long id;
+
+    @NotNull
+    @Column(name = &quot;property_name&quot;, nullable = false)
+    private String propertyName;
+
+    @Column(name = &quot;property_value&quot;)
+    private String propertyValue;
+
+    @ManyToOne
+    private MeasureInstance measureInstance;
+
+    public Long getId() {
+<span class="nc" id="L43">        return id;</span>
+    }
+
+    public void setId(Long id) {
+<span class="nc" id="L47">        this.id = id;</span>
+<span class="nc" id="L48">    }</span>
+
+    public String getPropertyName() {
+<span class="nc" id="L51">        return propertyName;</span>
+    }
+
+    public MeasureProperty propertyName(String propertyName) {
+<span class="nc" id="L55">        this.propertyName = propertyName;</span>
+<span class="nc" id="L56">        return this;</span>
+    }
+
+    public void setPropertyName(String propertyName) {
+<span class="nc" id="L60">        this.propertyName = propertyName;</span>
+<span class="nc" id="L61">    }</span>
+
+    public String getPropertyValue() {
+<span class="nc" id="L64">        return propertyValue;</span>
+    }
+
+    public MeasureProperty propertyValue(String propertyValue) {
+<span class="nc" id="L68">        this.propertyValue = propertyValue;</span>
+<span class="nc" id="L69">        return this;</span>
+    }
+
+    public void setPropertyValue(String propertyValue) {
+<span class="nc" id="L73">        this.propertyValue = propertyValue;</span>
+<span class="nc" id="L74">    }</span>
+
+    public MeasureInstance getMeasureInstance() {
+<span class="nc" id="L77">        return measureInstance;</span>
+    }
+
+    public MeasureProperty measureInstance(MeasureInstance measureInstance) {
+<span class="nc" id="L81">        this.measureInstance = measureInstance;</span>
+<span class="nc" id="L82">        return this;</span>
+    }
+
+    public void setMeasureInstance(MeasureInstance measureInstance) {
+<span class="nc" id="L86">        this.measureInstance = measureInstance;</span>
+<span class="nc" id="L87">    }</span>
+
+    @Override
+    public boolean equals(Object o) {
+<span class="nc bnc" id="L91" title="All 2 branches missed.">        if (this == o) {</span>
+<span class="nc" id="L92">            return true;</span>
+        }
+<span class="nc bnc" id="L94" title="All 4 branches missed.">        if (o == null || getClass() != o.getClass()) {</span>
+<span class="nc" id="L95">            return false;</span>
+        }
+<span class="nc" id="L97">        MeasureProperty measureProperty = (MeasureProperty) o;</span>
+<span class="nc bnc" id="L98" title="All 4 branches missed.">        if(measureProperty.id == null || id == null) {</span>
+<span class="nc" id="L99">            return false;</span>
+        }
+<span class="nc" id="L101">        return Objects.equals(id, measureProperty.id);</span>
+    }
+
+    @Override
+    public int hashCode() {
+<span class="nc" id="L106">        return Objects.hashCode(id);</span>
+    }
+
+    @Override
+    public String toString() {
+<span class="nc" id="L111">        return &quot;MeasureProperty{&quot; +</span>
+            &quot;id=&quot; + id +
+            &quot;, propertyName='&quot; + propertyName + &quot;'&quot; +
+            &quot;, propertyValue='&quot; + propertyValue + &quot;'&quot; +
+            '}';
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.7.201606060606</span></div></body></html>

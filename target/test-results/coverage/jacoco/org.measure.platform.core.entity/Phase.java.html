@@ -1,0 +1,224 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="fr"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Phase.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Measure Platform</a> &gt; <a href="index.source.html" class="el_package">org.measure.platform.core.entity</a> &gt; <span class="el_source">Phase.java</span></div><h1>Phase.java</h1><pre class="source lang-java linenums">package org.measure.platform.core.entity;
+
+import java.io.Serializable;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
+
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+/**
+ * A Phase.
+ */
+@Entity
+@Table(name = &quot;phase&quot;)
+@Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
+<span class="nc" id="L29">public class Phase implements Serializable {</span>
+
+	private static final long serialVersionUID = 1L;
+
+	@Id
+	@GeneratedValue(strategy = GenerationType.AUTO)
+	private Long id;
+
+	@NotNull
+	@Column(name = &quot;phase_name&quot;, nullable = false)
+	private String phaseName;
+
+	@Column(name = &quot;phase_description&quot;)
+	private String phaseDescription;
+
+	@ManyToOne
+	private Project project;
+
+<span class="nc" id="L47">	@OneToMany(mappedBy = &quot;phase&quot;)</span>
+	@JsonIgnore
+	@Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
+	private Set&lt;Dashboard&gt; dashboards = new HashSet&lt;&gt;();
+
+<span class="nc" id="L52">	@OneToMany(mappedBy = &quot;phase&quot;)</span>
+	@JsonIgnore
+	@Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
+	private Set&lt;MeasureView&gt; views = new HashSet&lt;&gt;();
+	
+	
+<span class="nc" id="L58">	@OneToMany(mappedBy = &quot;phaseoverview&quot;)</span>
+	@JsonIgnore
+	@Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
+	private Set&lt;MeasureView&gt; overviews = new HashSet&lt;&gt;();
+
+	@Column(name = &quot;phase_order&quot;)
+	private String order;
+
+	public Long getId() {
+<span class="nc" id="L67">		return id;</span>
+	}
+
+	public void setId(Long id) {
+<span class="nc" id="L71">		this.id = id;</span>
+<span class="nc" id="L72">	}</span>
+
+	public void setOrder(String order) {
+<span class="nc" id="L75">		this.order = order;</span>
+<span class="nc" id="L76">	}</span>
+
+	public String getOrder() {
+<span class="nc" id="L79">		return order;</span>
+	}
+
+	public String getPhaseName() {
+<span class="nc" id="L83">		return phaseName;</span>
+	}
+
+	public Phase phaseName(String phaseName) {
+<span class="nc" id="L87">		this.phaseName = phaseName;</span>
+<span class="nc" id="L88">		return this;</span>
+	}
+
+	public void setPhaseName(String phaseName) {
+<span class="nc" id="L92">		this.phaseName = phaseName;</span>
+<span class="nc" id="L93">	}</span>
+
+	public String getPhaseDescription() {
+<span class="nc" id="L96">		return phaseDescription;</span>
+	}
+
+	public Phase phaseDescription(String phaseDescription) {
+<span class="nc" id="L100">		this.phaseDescription = phaseDescription;</span>
+<span class="nc" id="L101">		return this;</span>
+	}
+
+	public void setPhaseDescription(String phaseDescription) {
+<span class="nc" id="L105">		this.phaseDescription = phaseDescription;</span>
+<span class="nc" id="L106">	}</span>
+
+	public Project getProject() {
+<span class="nc" id="L109">		return project;</span>
+	}
+
+	public Phase project(Project project) {
+<span class="nc" id="L113">		this.project = project;</span>
+<span class="nc" id="L114">		return this;</span>
+	}
+
+	public void setProject(Project project) {
+<span class="nc" id="L118">		this.project = project;</span>
+<span class="nc" id="L119">	}</span>
+
+	public Set&lt;Dashboard&gt; getDashboards() {
+<span class="nc" id="L122">		return dashboards;</span>
+	}
+
+	public Phase dashboards(Set&lt;Dashboard&gt; dashboards) {
+<span class="nc" id="L126">		this.dashboards = dashboards;</span>
+<span class="nc" id="L127">		return this;</span>
+	}
+
+	public Phase addDashboards(Dashboard dashboard) {
+<span class="nc" id="L131">		dashboards.add(dashboard);</span>
+<span class="nc" id="L132">		dashboard.setPhase(this);</span>
+<span class="nc" id="L133">		return this;</span>
+	}
+
+	public Phase removeDashboards(Dashboard dashboard) {
+<span class="nc" id="L137">		dashboards.remove(dashboard);</span>
+<span class="nc" id="L138">		dashboard.setPhase(null);</span>
+<span class="nc" id="L139">		return this;</span>
+	}
+
+	public void setDashboards(Set&lt;Dashboard&gt; dashboards) {
+<span class="nc" id="L143">		this.dashboards = dashboards;</span>
+<span class="nc" id="L144">	}</span>
+
+	public Set&lt;MeasureView&gt; getViews() {
+<span class="nc" id="L147">		return views;</span>
+	}
+
+	public Phase views(Set&lt;MeasureView&gt; measureViews) {
+<span class="nc" id="L151">		this.views = measureViews;</span>
+<span class="nc" id="L152">		return this;</span>
+	}
+
+	public Phase addViews(MeasureView measureView) {
+<span class="nc" id="L156">		views.add(measureView);</span>
+<span class="nc" id="L157">		measureView.setPhase(this);</span>
+<span class="nc" id="L158">		return this;</span>
+	}
+	
+	public Phase removeViews(MeasureView measureView) {
+<span class="nc" id="L162">		views.remove(measureView);</span>
+<span class="nc" id="L163">		measureView.setPhase(null);</span>
+<span class="nc" id="L164">		return this;</span>
+	}
+	
+	public void setViews(Set&lt;MeasureView&gt; measureViews) {
+<span class="nc" id="L168">		this.views = measureViews;</span>
+<span class="nc" id="L169">	}</span>
+
+	public Set&lt;MeasureView&gt; getOverviews() {
+<span class="nc" id="L172">		return overviews;</span>
+	}
+	
+	public Phase overviews(Set&lt;MeasureView&gt; measureViews) {
+<span class="nc" id="L176">		this.overviews = measureViews;</span>
+<span class="nc" id="L177">		return this;</span>
+	}
+
+	public Phase addOverviews(MeasureView measureView) {
+<span class="nc" id="L181">		overviews.add(measureView);</span>
+<span class="nc" id="L182">		measureView.setPhaseoverview(this);</span>
+<span class="nc" id="L183">		return this;</span>
+	}
+	
+	public Phase removeOverviews(MeasureView measureView) {
+<span class="nc" id="L187">		overviews.remove(measureView);</span>
+<span class="nc" id="L188">		measureView.setPhaseoverview(null);</span>
+<span class="nc" id="L189">		return this;</span>
+	}
+
+	public void setOverviews(Set&lt;MeasureView&gt; measureViews) {
+<span class="nc" id="L193">		this.overviews = measureViews;</span>
+<span class="nc" id="L194">	}</span>
+
+
+
+	@Override
+	public boolean equals(Object o) {
+<span class="nc bnc" id="L200" title="All 2 branches missed.">		if (this == o) {</span>
+<span class="nc" id="L201">			return true;</span>
+		}
+<span class="nc bnc" id="L203" title="All 4 branches missed.">		if (o == null || getClass() != o.getClass()) {</span>
+<span class="nc" id="L204">			return false;</span>
+		}
+<span class="nc" id="L206">		Phase phase = (Phase) o;</span>
+<span class="nc bnc" id="L207" title="All 4 branches missed.">		if (phase.id == null || id == null) {</span>
+<span class="nc" id="L208">			return false;</span>
+		}
+<span class="nc" id="L210">		return Objects.equals(id, phase.id);</span>
+	}
+
+	@Override
+	public int hashCode() {
+<span class="nc" id="L215">		return Objects.hashCode(id);</span>
+	}
+
+	@Override
+	public String toString() {
+<span class="nc" id="L220">		return &quot;Phase{&quot; + &quot;id=&quot; + id + &quot;, phaseName='&quot; + phaseName + &quot;'&quot; + &quot;, phaseDescription='&quot; + phaseDescription</span>
+				+ &quot;'}&quot;;
+	}
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.7.201606060606</span></div></body></html>

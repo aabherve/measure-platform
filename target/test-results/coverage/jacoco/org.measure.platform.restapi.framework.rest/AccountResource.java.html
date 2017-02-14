@@ -1,0 +1,270 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="fr"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AccountResource.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Measure Platform</a> &gt; <a href="index.source.html" class="el_package">org.measure.platform.restapi.framework.rest</a> &gt; <span class="el_source">AccountResource.java</span></div><h1>AccountResource.java</h1><pre class="source lang-java linenums">package org.measure.platform.restapi.framework.rest;
+
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.util.List;
+import java.util.Optional;
+
+import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
+
+import org.apache.commons.lang3.StringUtils;
+import org.measure.platform.core.impl.repository.PersistentTokenRepository;
+import org.measure.platform.core.impl.repository.UserRepository;
+import org.measure.platform.framework.domain.PersistentToken;
+import org.measure.platform.framework.domain.User;
+import org.measure.platform.framework.security.SecurityUtils;
+import org.measure.platform.framework.service.MailService;
+import org.measure.platform.framework.service.UserService;
+import org.measure.platform.framework.service.dto.UserDTO;
+import org.measure.platform.restapi.framework.rest.util.HeaderUtil;
+import org.measure.platform.restapi.framework.rest.vm.KeyAndPasswordVM;
+import org.measure.platform.restapi.framework.rest.vm.ManagedUserVM;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.codahale.metrics.annotation.Timed;
+
+/**
+ * REST controller for managing the current user's account.
+ */
+@RestController
+@RequestMapping(&quot;/api&quot;)
+<span class="nc" id="L46">public class AccountResource {</span>
+
+<span class="nc" id="L48">    private final Logger log = LoggerFactory.getLogger(AccountResource.class);</span>
+
+    @Inject
+    private UserRepository userRepository;
+
+    @Inject
+    private UserService userService;
+
+    @Inject
+    private PersistentTokenRepository persistentTokenRepository;
+
+    @Inject
+    private MailService mailService;
+
+    /**
+     * POST  /register : register the user.
+     *
+     * @param managedUserVM the managed user View Model
+     * @param request the HTTP request
+     * @return the ResponseEntity with status 201 (Created) if the user is registered or 400 (Bad Request) if the login or e-mail is already in use
+     */
+    @PostMapping(path = &quot;/register&quot;,
+                    produces={MediaType.APPLICATION_JSON_VALUE, MediaType.TEXT_PLAIN_VALUE})
+    @Timed
+    public ResponseEntity&lt;?&gt; registerAccount(@Valid @RequestBody ManagedUserVM managedUserVM, HttpServletRequest request) {
+
+<span class="nc" id="L74">        HttpHeaders textPlainHeaders = new HttpHeaders();</span>
+<span class="nc" id="L75">        textPlainHeaders.setContentType(MediaType.TEXT_PLAIN);</span>
+
+<span class="nc" id="L77">        return userRepository.findOneByLogin(managedUserVM.getLogin().toLowerCase())</span>
+<span class="nc" id="L78">            .map(user -&gt; new ResponseEntity&lt;&gt;(&quot;login already in use&quot;, textPlainHeaders, HttpStatus.BAD_REQUEST))</span>
+<span class="nc" id="L79">            .orElseGet(() -&gt; userRepository.findOneByEmail(managedUserVM.getEmail())</span>
+<span class="nc" id="L80">                .map(user -&gt; new ResponseEntity&lt;&gt;(&quot;e-mail address already in use&quot;, textPlainHeaders, HttpStatus.BAD_REQUEST))</span>
+<span class="nc" id="L81">                .orElseGet(() -&gt; {</span>
+<span class="nc" id="L82">                    User user = userService.createUser(managedUserVM.getLogin(), managedUserVM.getPassword(),</span>
+<span class="nc" id="L83">                    managedUserVM.getFirstName(), managedUserVM.getLastName(), managedUserVM.getEmail().toLowerCase(),</span>
+<span class="nc" id="L84">                    managedUserVM.getLangKey());</span>
+<span class="nc" id="L85">                    String baseUrl = request.getScheme() + // &quot;http&quot;</span>
+                    &quot;://&quot; +                                // &quot;://&quot;
+<span class="nc" id="L87">                    request.getServerName() +              // &quot;myhost&quot;</span>
+                    &quot;:&quot; +                                  // &quot;:&quot;
+<span class="nc" id="L89">                    request.getServerPort() +              // &quot;80&quot;</span>
+<span class="nc" id="L90">                    request.getContextPath();              // &quot;/myContextPath&quot; or &quot;&quot; if deployed in root context</span>
+
+<span class="nc" id="L92">                    mailService.sendActivationEmail(user, baseUrl);</span>
+<span class="nc" id="L93">                    return new ResponseEntity&lt;&gt;(HttpStatus.CREATED);</span>
+                })
+        );
+    }
+
+    /**
+     * GET  /activate : activate the registered user.
+     *
+     * @param key the activation key
+     * @return the ResponseEntity with status 200 (OK) and the activated user in body, or status 500 (Internal Server Error) if the user couldn't be activated
+     */
+    @GetMapping(&quot;/activate&quot;)
+    @Timed
+    public ResponseEntity&lt;String&gt; activateAccount(@RequestParam(value = &quot;key&quot;) String key) {
+<span class="nc" id="L107">        return userService.activateRegistration(key)</span>
+<span class="nc" id="L108">            .map(user -&gt; new ResponseEntity&lt;String&gt;(HttpStatus.OK))</span>
+<span class="nc" id="L109">            .orElse(new ResponseEntity&lt;&gt;(HttpStatus.INTERNAL_SERVER_ERROR));</span>
+    }
+
+    /**
+     * GET  /authenticate : check if the user is authenticated, and return its login.
+     *
+     * @param request the HTTP request
+     * @return the login if the user is authenticated
+     */
+    @GetMapping(&quot;/authenticate&quot;)
+    @Timed
+    public String isAuthenticated(HttpServletRequest request) {
+<span class="nc" id="L121">        log.debug(&quot;REST request to check if the current user is authenticated&quot;);</span>
+<span class="nc" id="L122">        return request.getRemoteUser();</span>
+    }
+
+    /**
+     * GET  /account : get the current user.
+     *
+     * @return the ResponseEntity with status 200 (OK) and the current user in body, or status 500 (Internal Server Error) if the user couldn't be returned
+     */
+    @GetMapping(&quot;/account&quot;)
+    @Timed
+    public ResponseEntity&lt;UserDTO&gt; getAccount() {
+<span class="nc" id="L133">        return Optional.ofNullable(userService.getUserWithAuthorities())</span>
+<span class="nc" id="L134">            .map(user -&gt; new ResponseEntity&lt;&gt;(new UserDTO(user), HttpStatus.OK))</span>
+<span class="nc" id="L135">            .orElse(new ResponseEntity&lt;&gt;(HttpStatus.INTERNAL_SERVER_ERROR));</span>
+    }
+
+    /**
+     * POST  /account : update the current user information.
+     *
+     * @param userDTO the current user information
+     * @return the ResponseEntity with status 200 (OK), or status 400 (Bad Request) or 500 (Internal Server Error) if the user couldn't be updated
+     */
+    @PostMapping(&quot;/account&quot;)
+    @Timed
+    public ResponseEntity&lt;String&gt; saveAccount(@Valid @RequestBody UserDTO userDTO) {
+<span class="nc" id="L147">        Optional&lt;User&gt; existingUser = userRepository.findOneByEmail(userDTO.getEmail());</span>
+<span class="nc bnc" id="L148" title="All 4 branches missed.">        if (existingUser.isPresent() &amp;&amp; (!existingUser.get().getLogin().equalsIgnoreCase(userDTO.getLogin()))) {</span>
+<span class="nc" id="L149">            return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(&quot;user-management&quot;, &quot;emailexists&quot;, &quot;Email already in use&quot;)).body(null);</span>
+        }
+<span class="nc" id="L151">        return userRepository</span>
+<span class="nc" id="L152">            .findOneByLogin(SecurityUtils.getCurrentUserLogin())</span>
+<span class="nc" id="L153">            .map(u -&gt; {</span>
+<span class="nc" id="L154">                userService.updateUser(userDTO.getFirstName(), userDTO.getLastName(), userDTO.getEmail(),</span>
+<span class="nc" id="L155">                    userDTO.getLangKey());</span>
+<span class="nc" id="L156">                return new ResponseEntity&lt;String&gt;(HttpStatus.OK);</span>
+            })
+<span class="nc" id="L158">            .orElseGet(() -&gt; new ResponseEntity&lt;&gt;(HttpStatus.INTERNAL_SERVER_ERROR));</span>
+    }
+
+    /**
+     * POST  /account/change_password : changes the current user's password
+     *
+     * @param password the new password
+     * @return the ResponseEntity with status 200 (OK), or status 400 (Bad Request) if the new password is not strong enough
+     */
+    @PostMapping(path = &quot;/account/change_password&quot;,
+        produces = MediaType.TEXT_PLAIN_VALUE)
+    @Timed
+    public ResponseEntity&lt;?&gt; changePassword(@RequestBody String password) {
+<span class="nc bnc" id="L171" title="All 2 branches missed.">        if (!checkPasswordLength(password)) {</span>
+<span class="nc" id="L172">            return new ResponseEntity&lt;&gt;(&quot;Incorrect password&quot;, HttpStatus.BAD_REQUEST);</span>
+        }
+<span class="nc" id="L174">        userService.changePassword(password);</span>
+<span class="nc" id="L175">        return new ResponseEntity&lt;&gt;(HttpStatus.OK);</span>
+    }
+
+    /**
+     * GET  /account/sessions : get the current open sessions.
+     *
+     * @return the ResponseEntity with status 200 (OK) and the current open sessions in body,
+     *  or status 500 (Internal Server Error) if the current open sessions couldn't be retrieved
+     */
+    @GetMapping(&quot;/account/sessions&quot;)
+    @Timed
+    public ResponseEntity&lt;List&lt;PersistentToken&gt;&gt; getCurrentSessions() {
+<span class="nc" id="L187">        return userRepository.findOneByLogin(SecurityUtils.getCurrentUserLogin())</span>
+<span class="nc" id="L188">            .map(user -&gt; new ResponseEntity&lt;&gt;(</span>
+<span class="nc" id="L189">                persistentTokenRepository.findByUser(user),</span>
+                HttpStatus.OK))
+<span class="nc" id="L191">            .orElse(new ResponseEntity&lt;&gt;(HttpStatus.INTERNAL_SERVER_ERROR));</span>
+    }
+
+    /**
+     * DELETE  /account/sessions?series={series} : invalidate an existing session.
+     *
+     * - You can only delete your own sessions, not any other user's session
+     * - If you delete one of your existing sessions, and that you are currently logged in on that session, you will
+     *   still be able to use that session, until you quit your browser: it does not work in real time (there is
+     *   no API for that), it only removes the &quot;remember me&quot; cookie
+     * - This is also true if you invalidate your current session: you will still be able to use it until you close
+     *   your browser or that the session times out. But automatic login (the &quot;remember me&quot; cookie) will not work
+     *   anymore.
+     *   There is an API to invalidate the current session, but there is no API to check which session uses which
+     *   cookie.
+     *
+     * @param series the series of an existing session
+     * @throws UnsupportedEncodingException if the series couldnt be URL decoded
+     */
+    @DeleteMapping(&quot;/account/sessions/{series}&quot;)
+    @Timed
+    public void invalidateSession(@PathVariable String series) throws UnsupportedEncodingException {
+<span class="nc" id="L213">        String decodedSeries = URLDecoder.decode(series, &quot;UTF-8&quot;);</span>
+<span class="nc" id="L214">        userRepository.findOneByLogin(SecurityUtils.getCurrentUserLogin()).ifPresent(u -&gt; {</span>
+<span class="nc" id="L215">            persistentTokenRepository.findByUser(u).stream()</span>
+<span class="nc" id="L216">                .filter(persistentToken -&gt; StringUtils.equals(persistentToken.getSeries(), decodedSeries))</span>
+<span class="nc" id="L217">                .findAny().ifPresent(t -&gt; persistentTokenRepository.delete(decodedSeries));</span>
+<span class="nc" id="L218">        });</span>
+<span class="nc" id="L219">    }</span>
+
+    /**
+     * POST   /account/reset_password/init : Send an e-mail to reset the password of the user
+     *
+     * @param mail the mail of the user
+     * @param request the HTTP request
+     * @return the ResponseEntity with status 200 (OK) if the e-mail was sent, or status 400 (Bad Request) if the e-mail address is not registered
+     */
+    @PostMapping(path = &quot;/account/reset_password/init&quot;,
+        produces = MediaType.TEXT_PLAIN_VALUE)
+    @Timed
+    public ResponseEntity&lt;?&gt; requestPasswordReset(@RequestBody String mail, HttpServletRequest request) {
+<span class="nc" id="L232">        return userService.requestPasswordReset(mail)</span>
+<span class="nc" id="L233">            .map(user -&gt; {</span>
+<span class="nc" id="L234">                String baseUrl = request.getScheme() +</span>
+                    &quot;://&quot; +
+<span class="nc" id="L236">                    request.getServerName() +</span>
+                    &quot;:&quot; +
+<span class="nc" id="L238">                    request.getServerPort() +</span>
+<span class="nc" id="L239">                    request.getContextPath();</span>
+<span class="nc" id="L240">                mailService.sendPasswordResetMail(user, baseUrl);</span>
+<span class="nc" id="L241">                return new ResponseEntity&lt;&gt;(&quot;e-mail was sent&quot;, HttpStatus.OK);</span>
+<span class="nc" id="L242">            }).orElse(new ResponseEntity&lt;&gt;(&quot;e-mail address not registered&quot;, HttpStatus.BAD_REQUEST));</span>
+    }
+
+    /**
+     * POST   /account/reset_password/finish : Finish to reset the password of the user
+     *
+     * @param keyAndPassword the generated key and the new password
+     * @return the ResponseEntity with status 200 (OK) if the password has been reset,
+     * or status 400 (Bad Request) or 500 (Internal Server Error) if the password could not be reset
+     */
+    @PostMapping(path = &quot;/account/reset_password/finish&quot;,
+        produces = MediaType.TEXT_PLAIN_VALUE)
+    @Timed
+    public ResponseEntity&lt;String&gt; finishPasswordReset(@RequestBody KeyAndPasswordVM keyAndPassword) {
+<span class="nc bnc" id="L256" title="All 2 branches missed.">        if (!checkPasswordLength(keyAndPassword.getNewPassword())) {</span>
+<span class="nc" id="L257">            return new ResponseEntity&lt;&gt;(&quot;Incorrect password&quot;, HttpStatus.BAD_REQUEST);</span>
+        }
+<span class="nc" id="L259">        return userService.completePasswordReset(keyAndPassword.getNewPassword(), keyAndPassword.getKey())</span>
+<span class="nc" id="L260">              .map(user -&gt; new ResponseEntity&lt;String&gt;(HttpStatus.OK))</span>
+<span class="nc" id="L261">              .orElse(new ResponseEntity&lt;&gt;(HttpStatus.INTERNAL_SERVER_ERROR));</span>
+    }
+
+    private boolean checkPasswordLength(String password) {
+<span class="nc bnc" id="L265" title="All 2 branches missed.">        return (!StringUtils.isEmpty(password) &amp;&amp;</span>
+<span class="nc bnc" id="L266" title="All 2 branches missed.">            password.length() &gt;= ManagedUserVM.PASSWORD_MIN_LENGTH &amp;&amp;</span>
+<span class="nc bnc" id="L267" title="All 2 branches missed.">            password.length() &lt;= ManagedUserVM.PASSWORD_MAX_LENGTH);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.7.201606060606</span></div></body></html>

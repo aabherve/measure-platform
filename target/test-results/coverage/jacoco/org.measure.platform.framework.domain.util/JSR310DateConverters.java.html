@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="fr"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>JSR310DateConverters.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Measure Platform</a> &gt; <a href="index.source.html" class="el_package">org.measure.platform.framework.domain.util</a> &gt; <span class="el_source">JSR310DateConverters.java</span></div><h1>JSR310DateConverters.java</h1><pre class="source lang-java linenums">package org.measure.platform.framework.domain.util;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.util.Date;
+
+import org.springframework.core.convert.converter.Converter;
+
+public final class JSR310DateConverters {
+
+<span class="nc" id="L13">    private JSR310DateConverters() {}</span>
+
+    public static class LocalDateToDateConverter implements Converter&lt;LocalDate, Date&gt; {
+
+<span class="nc" id="L17">        public static final LocalDateToDateConverter INSTANCE = new LocalDateToDateConverter();</span>
+
+<span class="nc" id="L19">        private LocalDateToDateConverter() {}</span>
+
+        @Override
+        public Date convert(LocalDate source) {
+<span class="nc bnc" id="L23" title="All 2 branches missed.">            return source == null ? null : Date.from(source.atStartOfDay(ZoneId.systemDefault()).toInstant());</span>
+        }
+    }
+
+    public static class DateToLocalDateConverter implements Converter&lt;Date, LocalDate&gt; {
+<span class="nc" id="L28">        public static final DateToLocalDateConverter INSTANCE = new DateToLocalDateConverter();</span>
+<span class="nc" id="L29">        private DateToLocalDateConverter() {}</span>
+
+        @Override
+        public LocalDate convert(Date source) {
+<span class="nc bnc" id="L33" title="All 2 branches missed.">            return source == null ? null : ZonedDateTime.ofInstant(source.toInstant(), ZoneId.systemDefault()).toLocalDate();</span>
+        }
+    }
+
+    public static class ZonedDateTimeToDateConverter implements Converter&lt;ZonedDateTime, Date&gt; {
+<span class="nc" id="L38">        public static final ZonedDateTimeToDateConverter INSTANCE = new ZonedDateTimeToDateConverter();</span>
+<span class="nc" id="L39">        private ZonedDateTimeToDateConverter() {}</span>
+
+        @Override
+        public Date convert(ZonedDateTime source) {
+<span class="nc bnc" id="L43" title="All 2 branches missed.">            return source == null ? null : Date.from(source.toInstant());</span>
+        }
+    }
+
+    public static class DateToZonedDateTimeConverter implements Converter&lt;Date, ZonedDateTime&gt; {
+<span class="nc" id="L48">        public static final DateToZonedDateTimeConverter INSTANCE = new DateToZonedDateTimeConverter();</span>
+<span class="nc" id="L49">        private DateToZonedDateTimeConverter() {}</span>
+
+        @Override
+        public ZonedDateTime convert(Date source) {
+<span class="nc bnc" id="L53" title="All 2 branches missed.">            return source == null ? null : ZonedDateTime.ofInstant(source.toInstant(), ZoneId.systemDefault());</span>
+        }
+    }
+
+    public static class LocalDateTimeToDateConverter implements Converter&lt;LocalDateTime, Date&gt; {
+<span class="nc" id="L58">        public static final LocalDateTimeToDateConverter INSTANCE = new LocalDateTimeToDateConverter();</span>
+<span class="nc" id="L59">        private LocalDateTimeToDateConverter() {}</span>
+
+        @Override
+        public Date convert(LocalDateTime source) {
+<span class="nc bnc" id="L63" title="All 2 branches missed.">            return source == null ? null : Date.from(source.atZone(ZoneId.systemDefault()).toInstant());</span>
+        }
+    }
+
+    public static class DateToLocalDateTimeConverter implements Converter&lt;Date, LocalDateTime&gt; {
+<span class="nc" id="L68">        public static final DateToLocalDateTimeConverter INSTANCE = new DateToLocalDateTimeConverter();</span>
+<span class="nc" id="L69">        private DateToLocalDateTimeConverter() {}</span>
+
+        @Override
+        public LocalDateTime convert(Date source) {
+<span class="nc bnc" id="L73" title="All 2 branches missed.">            return source == null ? null : LocalDateTime.ofInstant(source.toInstant(), ZoneId.systemDefault());</span>
+        }
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.7.201606060606</span></div></body></html>

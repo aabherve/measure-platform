@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="fr"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Dashboard.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Measure Platform</a> &gt; <a href="index.source.html" class="el_package">org.measure.platform.core.entity</a> &gt; <span class="el_source">Dashboard.java</span></div><h1>Dashboard.java</h1><pre class="source lang-java linenums">package org.measure.platform.core.entity;
+
+import java.io.Serializable;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
+
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+/**
+ * A Dashboard.
+ */
+@Entity
+@Table(name = &quot;dashboard&quot;)
+@Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
+<span class="nc" id="L29">public class Dashboard implements Serializable {</span>
+
+    private static final long serialVersionUID = 1L;
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long id;
+
+    @NotNull
+    @Column(name = &quot;dashboard_name&quot;, nullable = false)
+    private String dashboardName;
+
+    @Column(name = &quot;dashboard_description&quot;)
+    private String dashboardDescription;
+    
+    
+    @Column(name = &quot;dashboard_isexternal&quot;)
+    private Boolean isExternal;
+   
+    @Column(name = &quot;dashboard_content&quot;)
+    private String content;
+
+    @ManyToOne
+    private Phase phase;
+
+<span class="nc" id="L54">    @OneToMany(mappedBy = &quot;dashboard&quot;)</span>
+    @JsonIgnore
+    @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
+    private Set&lt;MeasureView&gt; views = new HashSet&lt;&gt;();
+
+    public Long getId() {
+<span class="nc" id="L60">        return id;</span>
+    }
+
+    public void setId(Long id) {
+<span class="nc" id="L64">        this.id = id;</span>
+<span class="nc" id="L65">    }</span>
+
+    public String getDashboardName() {
+<span class="nc" id="L68">        return dashboardName;</span>
+    }
+
+    public Dashboard dashboardName(String dashboardName) {
+<span class="nc" id="L72">        this.dashboardName = dashboardName;</span>
+<span class="nc" id="L73">        return this;</span>
+    }
+
+    public void setDashboardName(String dashboardName) {
+<span class="nc" id="L77">        this.dashboardName = dashboardName;</span>
+<span class="nc" id="L78">    }</span>
+
+    public String getDashboardDescription() {
+<span class="nc" id="L81">        return dashboardDescription;</span>
+    }
+
+    public Dashboard dashboardDescription(String dashboardDescription) {
+<span class="nc" id="L85">        this.dashboardDescription = dashboardDescription;</span>
+<span class="nc" id="L86">        return this;</span>
+    }
+
+    public void setDashboardDescription(String dashboardDescription) {
+<span class="nc" id="L90">        this.dashboardDescription = dashboardDescription;</span>
+<span class="nc" id="L91">    }</span>
+    
+    
+    
+
+    public Boolean getIsExternal() {
+<span class="nc" id="L97">		return isExternal;</span>
+	}
+
+	public void setIsExternal(Boolean isExternal) {
+<span class="nc" id="L101">		this.isExternal = isExternal;</span>
+<span class="nc" id="L102">	}</span>
+
+	public String getContent() {
+<span class="nc" id="L105">		return content;</span>
+	}
+
+	public void setContent(String content) {
+<span class="nc" id="L109">		this.content = content;</span>
+<span class="nc" id="L110">	}</span>
+
+	public Phase getPhase() {
+<span class="nc" id="L113">        return phase;</span>
+    }
+
+    public Dashboard phase(Phase phase) {
+<span class="nc" id="L117">        this.phase = phase;</span>
+<span class="nc" id="L118">        return this;</span>
+    }
+
+    public void setPhase(Phase phase) {
+<span class="nc" id="L122">        this.phase = phase;</span>
+<span class="nc" id="L123">    }</span>
+
+    public Set&lt;MeasureView&gt; getViews() {
+<span class="nc" id="L126">        return views;</span>
+    }
+
+    public Dashboard views(Set&lt;MeasureView&gt; measureViews) {
+<span class="nc" id="L130">        this.views = measureViews;</span>
+<span class="nc" id="L131">        return this;</span>
+    }
+
+    public Dashboard addViews(MeasureView measureView) {
+<span class="nc" id="L135">        views.add(measureView);</span>
+<span class="nc" id="L136">        measureView.setDashboard(this);</span>
+<span class="nc" id="L137">        return this;</span>
+    }
+
+    public Dashboard removeViews(MeasureView measureView) {
+<span class="nc" id="L141">        views.remove(measureView);</span>
+<span class="nc" id="L142">        measureView.setDashboard(null);</span>
+<span class="nc" id="L143">        return this;</span>
+    }
+
+    public void setViews(Set&lt;MeasureView&gt; measureViews) {
+<span class="nc" id="L147">        this.views = measureViews;</span>
+<span class="nc" id="L148">    }</span>
+
+    @Override
+    public boolean equals(Object o) {
+<span class="nc bnc" id="L152" title="All 2 branches missed.">        if (this == o) {</span>
+<span class="nc" id="L153">            return true;</span>
+        }
+<span class="nc bnc" id="L155" title="All 4 branches missed.">        if (o == null || getClass() != o.getClass()) {</span>
+<span class="nc" id="L156">            return false;</span>
+        }
+<span class="nc" id="L158">        Dashboard dashboard = (Dashboard) o;</span>
+<span class="nc bnc" id="L159" title="All 4 branches missed.">        if(dashboard.id == null || id == null) {</span>
+<span class="nc" id="L160">            return false;</span>
+        }
+<span class="nc" id="L162">        return Objects.equals(id, dashboard.id);</span>
+    }
+
+    @Override
+    public int hashCode() {
+<span class="nc" id="L167">        return Objects.hashCode(id);</span>
+    }
+
+    @Override
+    public String toString() {
+<span class="nc" id="L172">        return &quot;Dashboard{&quot; +</span>
+            &quot;id=&quot; + id +
+            &quot;, dashboardName='&quot; + dashboardName + &quot;'&quot; +
+            &quot;, dashboardDescription='&quot; + dashboardDescription + &quot;'&quot; +
+            '}';
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.7.201606060606</span></div></body></html>

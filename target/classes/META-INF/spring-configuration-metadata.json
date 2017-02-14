@@ -1,0 +1,286 @@
+{
+  "groups": [
+    {
+      "name": "jhipster",
+      "sourceType": "org.measure.platform.framework.config.JHipsterProperties",
+      "type": "org.measure.platform.framework.config.JHipsterProperties"
+    },
+    {
+      "name": "jhipster.async",
+      "sourceMethod": "getAsync()",
+      "sourceType": "org.measure.platform.framework.config.JHipsterProperties",
+      "type": "org.measure.platform.framework.config.JHipsterProperties$Async"
+    },
+    {
+      "name": "jhipster.cache",
+      "sourceMethod": "getCache()",
+      "sourceType": "org.measure.platform.framework.config.JHipsterProperties",
+      "type": "org.measure.platform.framework.config.JHipsterProperties$Cache"
+    },
+    {
+      "name": "jhipster.cache.ehcache",
+      "sourceMethod": "getEhcache()",
+      "sourceType": "org.measure.platform.framework.config.JHipsterProperties$Cache",
+      "type": "org.measure.platform.framework.config.JHipsterProperties$Cache$Ehcache"
+    },
+    {
+      "name": "jhipster.http",
+      "sourceMethod": "getHttp()",
+      "sourceType": "org.measure.platform.framework.config.JHipsterProperties",
+      "type": "org.measure.platform.framework.config.JHipsterProperties$Http"
+    },
+    {
+      "name": "jhipster.http.cache",
+      "sourceMethod": "getCache()",
+      "sourceType": "org.measure.platform.framework.config.JHipsterProperties$Http",
+      "type": "org.measure.platform.framework.config.JHipsterProperties$Http$Cache"
+    },
+    {
+      "name": "jhipster.logging",
+      "sourceMethod": "getLogging()",
+      "sourceType": "org.measure.platform.framework.config.JHipsterProperties",
+      "type": "org.measure.platform.framework.config.JHipsterProperties$Logging"
+    },
+    {
+      "name": "jhipster.logging.logstash",
+      "sourceMethod": "getLogstash()",
+      "sourceType": "org.measure.platform.framework.config.JHipsterProperties$Logging",
+      "type": "org.measure.platform.framework.config.JHipsterProperties$Logging$Logstash"
+    },
+    {
+      "name": "jhipster.mail",
+      "sourceMethod": "getMail()",
+      "sourceType": "org.measure.platform.framework.config.JHipsterProperties",
+      "type": "org.measure.platform.framework.config.JHipsterProperties$Mail"
+    },
+    {
+      "name": "jhipster.metrics",
+      "sourceMethod": "getMetrics()",
+      "sourceType": "org.measure.platform.framework.config.JHipsterProperties",
+      "type": "org.measure.platform.framework.config.JHipsterProperties$Metrics"
+    },
+    {
+      "name": "jhipster.metrics.graphite",
+      "sourceMethod": "getGraphite()",
+      "sourceType": "org.measure.platform.framework.config.JHipsterProperties$Metrics",
+      "type": "org.measure.platform.framework.config.JHipsterProperties$Metrics$Graphite"
+    },
+    {
+      "name": "jhipster.metrics.jmx",
+      "sourceMethod": "getJmx()",
+      "sourceType": "org.measure.platform.framework.config.JHipsterProperties$Metrics",
+      "type": "org.measure.platform.framework.config.JHipsterProperties$Metrics$Jmx"
+    },
+    {
+      "name": "jhipster.metrics.logs",
+      "sourceMethod": "getLogs()",
+      "sourceType": "org.measure.platform.framework.config.JHipsterProperties$Metrics",
+      "type": "org.measure.platform.framework.config.JHipsterProperties$Metrics$Logs"
+    },
+    {
+      "name": "jhipster.metrics.spark",
+      "sourceMethod": "getSpark()",
+      "sourceType": "org.measure.platform.framework.config.JHipsterProperties$Metrics",
+      "type": "org.measure.platform.framework.config.JHipsterProperties$Metrics$Spark"
+    },
+    {
+      "name": "jhipster.ribbon",
+      "sourceMethod": "getRibbon()",
+      "sourceType": "org.measure.platform.framework.config.JHipsterProperties",
+      "type": "org.measure.platform.framework.config.JHipsterProperties$Ribbon"
+    },
+    {
+      "name": "jhipster.security",
+      "sourceMethod": "getSecurity()",
+      "sourceType": "org.measure.platform.framework.config.JHipsterProperties",
+      "type": "org.measure.platform.framework.config.JHipsterProperties$Security"
+    },
+    {
+      "name": "jhipster.security.remember-me",
+      "sourceMethod": "getRememberMe()",
+      "sourceType": "org.measure.platform.framework.config.JHipsterProperties$Security",
+      "type": "org.measure.platform.framework.config.JHipsterProperties$Security$RememberMe"
+    },
+    {
+      "name": "jhipster.swagger",
+      "sourceMethod": "getSwagger()",
+      "sourceType": "org.measure.platform.framework.config.JHipsterProperties",
+      "type": "org.measure.platform.framework.config.JHipsterProperties$Swagger"
+    }
+  ],
+  "hints": [],
+  "properties": [
+    {
+      "defaultValue": 2,
+      "name": "jhipster.async.core-pool-size",
+      "sourceType": "org.measure.platform.framework.config.JHipsterProperties$Async",
+      "type": "java.lang.Integer"
+    },
+    {
+      "defaultValue": 50,
+      "name": "jhipster.async.max-pool-size",
+      "sourceType": "org.measure.platform.framework.config.JHipsterProperties$Async",
+      "type": "java.lang.Integer"
+    },
+    {
+      "defaultValue": 10000,
+      "name": "jhipster.async.queue-capacity",
+      "sourceType": "org.measure.platform.framework.config.JHipsterProperties$Async",
+      "type": "java.lang.Integer"
+    },
+    {
+      "defaultValue": "16M",
+      "name": "jhipster.cache.ehcache.max-bytes-local-heap",
+      "sourceType": "org.measure.platform.framework.config.JHipsterProperties$Cache$Ehcache",
+      "type": "java.lang.String"
+    },
+    {
+      "defaultValue": 1461,
+      "name": "jhipster.http.cache.time-to-live-in-days",
+      "sourceType": "org.measure.platform.framework.config.JHipsterProperties$Http$Cache",
+      "type": "java.lang.Integer"
+    },
+    {
+      "defaultValue": false,
+      "name": "jhipster.logging.logstash.enabled",
+      "sourceType": "org.measure.platform.framework.config.JHipsterProperties$Logging$Logstash",
+      "type": "java.lang.Boolean"
+    },
+    {
+      "defaultValue": "localhost",
+      "name": "jhipster.logging.logstash.host",
+      "sourceType": "org.measure.platform.framework.config.JHipsterProperties$Logging$Logstash",
+      "type": "java.lang.String"
+    },
+    {
+      "defaultValue": 5000,
+      "name": "jhipster.logging.logstash.port",
+      "sourceType": "org.measure.platform.framework.config.JHipsterProperties$Logging$Logstash",
+      "type": "java.lang.Integer"
+    },
+    {
+      "defaultValue": 512,
+      "name": "jhipster.logging.logstash.queue-size",
+      "sourceType": "org.measure.platform.framework.config.JHipsterProperties$Logging$Logstash",
+      "type": "java.lang.Integer"
+    },
+    {
+      "defaultValue": "MeasurePlatform@localhost",
+      "name": "jhipster.mail.from",
+      "sourceType": "org.measure.platform.framework.config.JHipsterProperties$Mail",
+      "type": "java.lang.String"
+    },
+    {
+      "defaultValue": false,
+      "name": "jhipster.metrics.graphite.enabled",
+      "sourceType": "org.measure.platform.framework.config.JHipsterProperties$Metrics$Graphite",
+      "type": "java.lang.Boolean"
+    },
+    {
+      "defaultValue": "localhost",
+      "name": "jhipster.metrics.graphite.host",
+      "sourceType": "org.measure.platform.framework.config.JHipsterProperties$Metrics$Graphite",
+      "type": "java.lang.String"
+    },
+    {
+      "defaultValue": 2003,
+      "name": "jhipster.metrics.graphite.port",
+      "sourceType": "org.measure.platform.framework.config.JHipsterProperties$Metrics$Graphite",
+      "type": "java.lang.Integer"
+    },
+    {
+      "defaultValue": "MeasurePlatform",
+      "name": "jhipster.metrics.graphite.prefix",
+      "sourceType": "org.measure.platform.framework.config.JHipsterProperties$Metrics$Graphite",
+      "type": "java.lang.String"
+    },
+    {
+      "defaultValue": true,
+      "name": "jhipster.metrics.jmx.enabled",
+      "sourceType": "org.measure.platform.framework.config.JHipsterProperties$Metrics$Jmx",
+      "type": "java.lang.Boolean"
+    },
+    {
+      "defaultValue": false,
+      "name": "jhipster.metrics.logs.enabled",
+      "sourceType": "org.measure.platform.framework.config.JHipsterProperties$Metrics$Logs",
+      "type": "java.lang.Boolean"
+    },
+    {
+      "defaultValue": false,
+      "name": "jhipster.metrics.spark.enabled",
+      "sourceType": "org.measure.platform.framework.config.JHipsterProperties$Metrics$Spark",
+      "type": "java.lang.Boolean"
+    },
+    {
+      "defaultValue": "localhost",
+      "name": "jhipster.metrics.spark.host",
+      "sourceType": "org.measure.platform.framework.config.JHipsterProperties$Metrics$Spark",
+      "type": "java.lang.String"
+    },
+    {
+      "defaultValue": 9999,
+      "name": "jhipster.metrics.spark.port",
+      "sourceType": "org.measure.platform.framework.config.JHipsterProperties$Metrics$Spark",
+      "type": "java.lang.Integer"
+    },
+    {
+      "name": "jhipster.ribbon.display-on-active-profiles",
+      "sourceType": "org.measure.platform.framework.config.JHipsterProperties$Ribbon",
+      "type": "java.lang.String[]"
+    },
+    {
+      "name": "jhipster.security.remember-me.key",
+      "sourceType": "org.measure.platform.framework.config.JHipsterProperties$Security$RememberMe",
+      "type": "java.lang.String"
+    },
+    {
+      "name": "jhipster.swagger.contact-email",
+      "sourceType": "org.measure.platform.framework.config.JHipsterProperties$Swagger",
+      "type": "java.lang.String"
+    },
+    {
+      "name": "jhipster.swagger.contact-name",
+      "sourceType": "org.measure.platform.framework.config.JHipsterProperties$Swagger",
+      "type": "java.lang.String"
+    },
+    {
+      "name": "jhipster.swagger.contact-url",
+      "sourceType": "org.measure.platform.framework.config.JHipsterProperties$Swagger",
+      "type": "java.lang.String"
+    },
+    {
+      "defaultValue": "MeasurePlatform API documentation",
+      "name": "jhipster.swagger.description",
+      "sourceType": "org.measure.platform.framework.config.JHipsterProperties$Swagger",
+      "type": "java.lang.String"
+    },
+    {
+      "name": "jhipster.swagger.license",
+      "sourceType": "org.measure.platform.framework.config.JHipsterProperties$Swagger",
+      "type": "java.lang.String"
+    },
+    {
+      "name": "jhipster.swagger.license-url",
+      "sourceType": "org.measure.platform.framework.config.JHipsterProperties$Swagger",
+      "type": "java.lang.String"
+    },
+    {
+      "name": "jhipster.swagger.terms-of-service-url",
+      "sourceType": "org.measure.platform.framework.config.JHipsterProperties$Swagger",
+      "type": "java.lang.String"
+    },
+    {
+      "defaultValue": "MeasurePlatform API",
+      "name": "jhipster.swagger.title",
+      "sourceType": "org.measure.platform.framework.config.JHipsterProperties$Swagger",
+      "type": "java.lang.String"
+    },
+    {
+      "defaultValue": "0.0.1",
+      "name": "jhipster.swagger.version",
+      "sourceType": "org.measure.platform.framework.config.JHipsterProperties$Swagger",
+      "type": "java.lang.String"
+    }
+  ]
+}

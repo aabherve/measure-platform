@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="fr"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MeasureExecutionResource.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Measure Platform</a> &gt; <a href="index.source.html" class="el_package">org.measure.platform.restapi.app.services</a> &gt; <span class="el_source">MeasureExecutionResource.java</span></div><h1>MeasureExecutionResource.java</h1><pre class="source lang-java linenums">package org.measure.platform.restapi.app.services;
+
+import java.util.Optional;
+
+import javax.inject.Inject;
+
+import org.measure.platform.core.api.entitys.MeasureInstanceService;
+import org.measure.platform.core.entity.MeasureInstance;
+import org.measure.platform.smmengine.api.ILoggerService;
+import org.measure.platform.smmengine.api.IMeasureExecutionService;
+import org.measure.platform.smmengine.api.IShedulingService;
+import org.measure.smm.log.MeasureLog;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.codahale.metrics.annotation.Timed;
+
+@RestController
+
+@RequestMapping(value = &quot;api/measure-instance/sheduling&quot;)
+<span class="nc" id="L25">public class MeasureExecutionResource {</span>
+
+	@Inject
+	private IMeasureExecutionService measureExecutionService;
+
+	@Inject
+	private IShedulingService shedulingService;
+
+	@Inject
+	private MeasureInstanceService instanceService;
+	
+	@Inject
+	private ILoggerService logger;
+
+	@RequestMapping(value = &quot;/start&quot;, method = RequestMethod.GET)
+	public Boolean startMeasureSheduling(@RequestParam(&quot;id&quot;) String id) {
+<span class="nc bnc" id="L41" title="All 2 branches missed.">		if (id.matches(&quot;\\d+&quot;)) {</span>
+<span class="nc" id="L42">			Long instanceId = Long.valueOf(id);</span>
+<span class="nc bnc" id="L43" title="All 2 branches missed.">			if (!shedulingService.isShedule(instanceId)) {</span>
+<span class="nc" id="L44">				MeasureInstance measure = instanceService.findOne(instanceId);</span>
+<span class="nc" id="L45">				return shedulingService.scheduleMeasure(measure);</span>
+			}
+		}
+<span class="nc" id="L48">		return null;</span>
+	}
+
+	@RequestMapping(value = &quot;/stop&quot;, method = RequestMethod.GET)
+	public Boolean stopMeasureSheduling(@RequestParam(&quot;id&quot;) String id) {
+<span class="nc bnc" id="L53" title="All 2 branches missed.">		if (id.matches(&quot;\\d+&quot;)) {</span>
+<span class="nc" id="L54">			Long instanceId = Long.valueOf(id);</span>
+<span class="nc bnc" id="L55" title="All 2 branches missed.">			if (shedulingService.isShedule(instanceId)) {</span>
+<span class="nc" id="L56">				shedulingService.removeMeasure(instanceId);</span>
+			}
+		}
+<span class="nc" id="L59">		return false;</span>
+	}
+
+
+	@RequestMapping(value = &quot;/isshedule&quot;, method = RequestMethod.GET)
+	public Boolean isSheduledMeasure(@RequestParam(&quot;id&quot;) String id) {
+<span class="nc bnc" id="L65" title="All 2 branches missed.">		if (id.matches(&quot;\\d+&quot;)) {</span>
+<span class="nc" id="L66">			Long instanceId = Long.valueOf(id);</span>
+<span class="nc" id="L67">			return shedulingService.isShedule(instanceId);</span>
+		}
+<span class="nc" id="L69">		return false;</span>
+	}
+
+	@Timed
+	@RequestMapping(value = &quot;/test&quot;, method = RequestMethod.GET)
+	public ResponseEntity&lt;MeasureLog&gt; testMeasure(@RequestParam(&quot;id&quot;) String id) {
+<span class="nc bnc" id="L75" title="All 2 branches missed.">		if (id.matches(&quot;\\d+&quot;)) {</span>
+<span class="nc" id="L76">			Long instanceId = Long.valueOf(id);</span>
+<span class="nc" id="L77">			MeasureLog measurement = measureExecutionService.testMeasure(instanceId);</span>
+<span class="nc" id="L78">			return Optional.ofNullable(measurement).map(result -&gt; new ResponseEntity&lt;&gt;(result, HttpStatus.OK))</span>
+<span class="nc" id="L79">					.orElse(new ResponseEntity&lt;&gt;(HttpStatus.NOT_FOUND));</span>
+		}
+<span class="nc" id="L81">		return new ResponseEntity&lt;&gt;(HttpStatus.NOT_FOUND);</span>
+	}
+	
+	
+	@Timed
+	@RequestMapping(value = &quot;/execute&quot;, method = RequestMethod.GET)
+	public ResponseEntity&lt;MeasureLog&gt; executeMeasure(@RequestParam(&quot;id&quot;) String id) {
+<span class="nc bnc" id="L88" title="All 2 branches missed.">		if (id.matches(&quot;\\d+&quot;)) {</span>
+<span class="nc" id="L89">			Long instanceId = Long.valueOf(id);</span>
+<span class="nc" id="L90">			MeasureLog measurement = measureExecutionService.executeMeasure(instanceId);</span>
+<span class="nc" id="L91">			logger.addMeasureExecutionLog(measurement);</span>
+<span class="nc" id="L92">			return Optional.ofNullable(measurement).map(result -&gt; new ResponseEntity&lt;&gt;(result, HttpStatus.OK))</span>
+<span class="nc" id="L93">					.orElse(new ResponseEntity&lt;&gt;(HttpStatus.NOT_FOUND));</span>
+		}
+<span class="nc" id="L95">		return new ResponseEntity&lt;&gt;(HttpStatus.NOT_FOUND);</span>
+	}
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.7.201606060606</span></div></body></html>

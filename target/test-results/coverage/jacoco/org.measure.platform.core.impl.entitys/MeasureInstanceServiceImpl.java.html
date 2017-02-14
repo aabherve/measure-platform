@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="fr"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MeasureInstanceServiceImpl.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Measure Platform</a> &gt; <a href="index.source.html" class="el_package">org.measure.platform.core.impl.entitys</a> &gt; <span class="el_source">MeasureInstanceServiceImpl.java</span></div><h1>MeasureInstanceServiceImpl.java</h1><pre class="source lang-java linenums">package org.measure.platform.core.impl.entitys;
+
+import java.util.List;
+
+import javax.inject.Inject;
+
+import org.measure.platform.core.api.entitys.MeasureInstanceService;
+import org.measure.platform.core.entity.MeasureInstance;
+import org.measure.platform.core.entity.MeasureProperty;
+import org.measure.platform.core.entity.MeasureReference;
+import org.measure.platform.core.entity.Project;
+import org.measure.platform.core.impl.repository.MeasureInstanceRepository;
+import org.measure.platform.core.impl.repository.MeasurePropertyRepository;
+import org.measure.platform.core.impl.repository.MeasureReferenceRepository;
+import org.measure.platform.core.impl.repository.ProjectRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+/**
+ * Service Implementation for managing MeasureInstance.
+ */
+@Service
+@Transactional
+<span class="nc" id="L26">public class MeasureInstanceServiceImpl implements MeasureInstanceService {</span>
+
+<span class="nc" id="L28">	private final Logger log = LoggerFactory.getLogger(MeasureInstanceServiceImpl.class);</span>
+
+	@Inject
+	private MeasureInstanceRepository measureInstanceRepository;
+
+	@Inject
+	private ProjectRepository projectRepository;
+
+	@Inject
+	private MeasurePropertyRepository propertyRepository;
+	
+	
+	@Inject
+	private MeasureReferenceRepository referenceRepository;
+
+	/**
+	 * Save a measureInstance.
+	 *
+	 * @param measureInstance
+	 *            the entity to save
+	 * @return the persisted entity
+	 */
+	public MeasureInstance save(MeasureInstance measureInstance) {
+<span class="nc" id="L51">		log.debug(&quot;Request to save MeasureInstance : {}&quot;, measureInstance);	</span>
+<span class="nc" id="L52">		MeasureInstance result = measureInstanceRepository.save(measureInstance);	</span>
+<span class="nc" id="L53">		return result;</span>
+	}
+
+	/**
+	 * Get all the measureInstances.
+	 * 
+	 * @return the list of entities
+	 */
+	@Transactional(readOnly = true)
+	public List&lt;MeasureInstance&gt; findAll() {
+<span class="nc" id="L63">		log.debug(&quot;Request to get all MeasureInstances&quot;);</span>
+<span class="nc" id="L64">		List&lt;MeasureInstance&gt; result = measureInstanceRepository.findAll();</span>
+<span class="nc" id="L65">		return result;</span>
+	}
+
+	@Override
+	public List&lt;MeasureInstance&gt; findMeasureInstancesByProject(Long projectId) {
+<span class="nc" id="L70">		Project project = projectRepository.getOne(projectId);</span>
+<span class="nc" id="L71">		List&lt;MeasureInstance&gt; result = measureInstanceRepository.findByProject(project);</span>
+<span class="nc" id="L72">		return result;</span>
+	}
+	
+	
+	@Override
+	public List&lt;MeasureInstance&gt; findMeasureInstanceByReference(String measureid) {
+<span class="nc" id="L78">		List&lt;MeasureInstance&gt; result = measureInstanceRepository.findByMeasure(measureid);</span>
+<span class="nc" id="L79">		return result;</span>
+	}
+
+	/**
+	 * Get one measureInstance by id.
+	 *
+	 * @param id
+	 *            the id of the entity
+	 * @return the entity
+	 */
+	@Transactional(readOnly = true)
+	public MeasureInstance findOne(Long id) {
+<span class="nc" id="L91">		log.debug(&quot;Request to get MeasureInstance : {}&quot;, id);</span>
+<span class="nc" id="L92">		MeasureInstance measureInstance = measureInstanceRepository.findOne(id);</span>
+<span class="nc" id="L93">		return measureInstance;</span>
+	}
+
+	/**
+	 * Delete the measureInstance by id.
+	 *
+	 * @param id
+	 *            the id of the entity
+	 */
+	public void delete(Long id) {
+		
+<span class="nc" id="L104">		MeasureInstance minstance = measureInstanceRepository.findOne(id);</span>
+<span class="nc bnc" id="L105" title="All 2 branches missed.">		for(MeasureProperty prop : propertyRepository.findByMeasure(minstance)){</span>
+<span class="nc" id="L106">			propertyRepository.delete(prop);</span>
+<span class="nc" id="L107">		}</span>
+		
+<span class="nc bnc" id="L109" title="All 2 branches missed.">		for(MeasureProperty prop : propertyRepository.findByMeasure(minstance)){</span>
+<span class="nc" id="L110">			propertyRepository.delete(prop);</span>
+<span class="nc" id="L111">		}</span>
+		
+		
+<span class="nc bnc" id="L114" title="All 2 branches missed.">		for(MeasureReference prop : referenceRepository.findByMeasure(minstance)){</span>
+<span class="nc" id="L115">			referenceRepository.delete(prop);</span>
+<span class="nc" id="L116">		}</span>
+		
+<span class="nc" id="L118">		measureInstanceRepository.delete(id);</span>
+<span class="nc" id="L119">	}</span>
+
+	
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.7.201606060606</span></div></body></html>

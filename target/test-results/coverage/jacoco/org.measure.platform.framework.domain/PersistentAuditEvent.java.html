@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="fr"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>PersistentAuditEvent.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Measure Platform</a> &gt; <a href="index.source.html" class="el_package">org.measure.platform.framework.domain</a> &gt; <span class="el_source">PersistentAuditEvent.java</span></div><h1>PersistentAuditEvent.java</h1><pre class="source lang-java linenums">package org.measure.platform.framework.domain;
+
+import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.persistence.CollectionTable;
+import javax.persistence.Column;
+import javax.persistence.ElementCollection;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.MapKeyColumn;
+import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
+
+/**
+ * Persist AuditEvent managed by the Spring Boot actuator
+ * @see org.springframework.boot.actuate.audit.AuditEvent
+ */
+@Entity
+@Table(name = &quot;jhi_persistent_audit_event&quot;)
+<span class="nc" id="L25">public class PersistentAuditEvent {</span>
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = &quot;event_id&quot;)
+    private Long id;
+
+    @NotNull
+    @Column(nullable = false)
+    private String principal;
+
+    @Column(name = &quot;event_date&quot;)
+    private LocalDateTime auditEventDate;
+    @Column(name = &quot;event_type&quot;)
+    private String auditEventType;
+
+<span class="nc" id="L41">    @ElementCollection</span>
+    @MapKeyColumn(name = &quot;name&quot;)
+    @Column(name = &quot;value&quot;)
+    @CollectionTable(name = &quot;jhi_persistent_audit_evt_data&quot;, joinColumns=@JoinColumn(name=&quot;event_id&quot;))
+    private Map&lt;String, String&gt; data = new HashMap&lt;&gt;();
+
+    public Long getId() {
+<span class="nc" id="L48">        return id;</span>
+    }
+
+    public void setId(Long id) {
+<span class="nc" id="L52">        this.id = id;</span>
+<span class="nc" id="L53">    }</span>
+
+    public String getPrincipal() {
+<span class="nc" id="L56">        return principal;</span>
+    }
+
+    public void setPrincipal(String principal) {
+<span class="nc" id="L60">        this.principal = principal;</span>
+<span class="nc" id="L61">    }</span>
+
+    public LocalDateTime getAuditEventDate() {
+<span class="nc" id="L64">        return auditEventDate;</span>
+    }
+
+    public void setAuditEventDate(LocalDateTime auditEventDate) {
+<span class="nc" id="L68">        this.auditEventDate = auditEventDate;</span>
+<span class="nc" id="L69">    }</span>
+
+    public String getAuditEventType() {
+<span class="nc" id="L72">        return auditEventType;</span>
+    }
+
+    public void setAuditEventType(String auditEventType) {
+<span class="nc" id="L76">        this.auditEventType = auditEventType;</span>
+<span class="nc" id="L77">    }</span>
+
+    public Map&lt;String, String&gt; getData() {
+<span class="nc" id="L80">        return data;</span>
+    }
+
+    public void setData(Map&lt;String, String&gt; data) {
+<span class="nc" id="L84">        this.data = data;</span>
+<span class="nc" id="L85">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.7.201606060606</span></div></body></html>

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="fr"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ApplicationWebXml.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Measure Platform</a> &gt; <a href="index.source.html" class="el_package">org.measure.platform</a> &gt; <span class="el_source">ApplicationWebXml.java</span></div><h1>ApplicationWebXml.java</h1><pre class="source lang-java linenums">package org.measure.platform;
+
+import org.measure.platform.framework.config.DefaultProfileUtil;
+import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.boot.web.support.SpringBootServletInitializer;
+
+/**
+ * This is a helper Java class that provides an alternative to creating a web.xml.
+ * This will be invoked only when the application is deployed to a servlet container like Tomcat, Jboss etc.
+ */
+<span class="nc" id="L11">public class ApplicationWebXml extends SpringBootServletInitializer {</span>
+
+    @Override
+    protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
+        /**
+         * set a default to use when no profile is configured.
+         */
+<span class="nc" id="L18">        DefaultProfileUtil.addDefaultProfile(application.application());</span>
+<span class="nc" id="L19">        return application.sources(MeasurePlatformApp.class);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.7.201606060606</span></div></body></html>

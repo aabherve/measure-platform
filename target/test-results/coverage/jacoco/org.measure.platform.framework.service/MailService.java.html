@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="fr"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MailService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Measure Platform</a> &gt; <a href="index.source.html" class="el_package">org.measure.platform.framework.service</a> &gt; <span class="el_source">MailService.java</span></div><h1>MailService.java</h1><pre class="source lang-java linenums">package org.measure.platform.framework.service;
+
+import java.util.Locale;
+
+import javax.inject.Inject;
+import javax.mail.internet.MimeMessage;
+
+import org.apache.commons.lang3.CharEncoding;
+import org.measure.platform.framework.config.JHipsterProperties;
+import org.measure.platform.framework.domain.User;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.context.MessageSource;
+import org.springframework.mail.javamail.JavaMailSenderImpl;
+import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.stereotype.Service;
+import org.thymeleaf.context.Context;
+import org.thymeleaf.spring4.SpringTemplateEngine;
+
+/**
+ * Service for sending e-mails.
+ * &lt;p&gt;
+ * We use the @Async annotation to send e-mails asynchronously.
+ * &lt;/p&gt;
+ */
+@Service
+<span class="nc" id="L28">public class MailService {</span>
+
+<span class="nc" id="L30">    private final Logger log = LoggerFactory.getLogger(MailService.class);</span>
+
+    private static final String USER = &quot;user&quot;;
+    private static final String BASE_URL = &quot;baseUrl&quot;;
+
+    @Inject
+    private JHipsterProperties jHipsterProperties;
+
+    @Inject
+    private JavaMailSenderImpl javaMailSender;
+
+    @Inject
+    private MessageSource messageSource;
+
+    @Inject
+    private SpringTemplateEngine templateEngine;
+
+    @Async
+    public void sendEmail(String to, String subject, String content, boolean isMultipart, boolean isHtml) {
+<span class="nc" id="L49">        log.debug(&quot;Send e-mail[multipart '{}' and html '{}'] to '{}' with subject '{}' and content={}&quot;,</span>
+<span class="nc" id="L50">            isMultipart, isHtml, to, subject, content);</span>
+
+        // Prepare message using a Spring helper
+<span class="nc" id="L53">        MimeMessage mimeMessage = javaMailSender.createMimeMessage();</span>
+        try {
+<span class="nc" id="L55">            MimeMessageHelper message = new MimeMessageHelper(mimeMessage, isMultipart, CharEncoding.UTF_8);</span>
+<span class="nc" id="L56">            message.setTo(to);</span>
+<span class="nc" id="L57">            message.setFrom(jHipsterProperties.getMail().getFrom());</span>
+<span class="nc" id="L58">            message.setSubject(subject);</span>
+<span class="nc" id="L59">            message.setText(content, isHtml);</span>
+<span class="nc" id="L60">            javaMailSender.send(mimeMessage);</span>
+<span class="nc" id="L61">            log.debug(&quot;Sent e-mail to User '{}'&quot;, to);</span>
+<span class="nc" id="L62">        } catch (Exception e) {</span>
+<span class="nc" id="L63">            log.warn(&quot;E-mail could not be sent to user '{}'&quot;, to, e);</span>
+<span class="nc" id="L64">        }</span>
+<span class="nc" id="L65">    }</span>
+
+    @Async
+    public void sendActivationEmail(User user, String baseUrl) {
+<span class="nc" id="L69">        log.debug(&quot;Sending activation e-mail to '{}'&quot;, user.getEmail());</span>
+<span class="nc" id="L70">        Locale locale = Locale.forLanguageTag(user.getLangKey());</span>
+<span class="nc" id="L71">        Context context = new Context(locale);</span>
+<span class="nc" id="L72">        context.setVariable(USER, user);</span>
+<span class="nc" id="L73">        context.setVariable(BASE_URL, baseUrl);</span>
+<span class="nc" id="L74">        String content = templateEngine.process(&quot;activationEmail&quot;, context);</span>
+<span class="nc" id="L75">        String subject = messageSource.getMessage(&quot;email.activation.title&quot;, null, locale);</span>
+<span class="nc" id="L76">        sendEmail(user.getEmail(), subject, content, false, true);</span>
+<span class="nc" id="L77">    }</span>
+
+    @Async
+    public void sendCreationEmail(User user, String baseUrl) {
+<span class="nc" id="L81">        log.debug(&quot;Sending creation e-mail to '{}'&quot;, user.getEmail());</span>
+<span class="nc" id="L82">        Locale locale = Locale.forLanguageTag(user.getLangKey());</span>
+<span class="nc" id="L83">        Context context = new Context(locale);</span>
+<span class="nc" id="L84">        context.setVariable(USER, user);</span>
+<span class="nc" id="L85">        context.setVariable(BASE_URL, baseUrl);</span>
+<span class="nc" id="L86">        String content = templateEngine.process(&quot;creationEmail&quot;, context);</span>
+<span class="nc" id="L87">        String subject = messageSource.getMessage(&quot;email.activation.title&quot;, null, locale);</span>
+<span class="nc" id="L88">        sendEmail(user.getEmail(), subject, content, false, true);</span>
+<span class="nc" id="L89">    }</span>
+
+    @Async
+    public void sendPasswordResetMail(User user, String baseUrl) {
+<span class="nc" id="L93">        log.debug(&quot;Sending password reset e-mail to '{}'&quot;, user.getEmail());</span>
+<span class="nc" id="L94">        Locale locale = Locale.forLanguageTag(user.getLangKey());</span>
+<span class="nc" id="L95">        Context context = new Context(locale);</span>
+<span class="nc" id="L96">        context.setVariable(USER, user);</span>
+<span class="nc" id="L97">        context.setVariable(BASE_URL, baseUrl);</span>
+<span class="nc" id="L98">        String content = templateEngine.process(&quot;passwordResetEmail&quot;, context);</span>
+<span class="nc" id="L99">        String subject = messageSource.getMessage(&quot;email.reset.title&quot;, null, locale);</span>
+<span class="nc" id="L100">        sendEmail(user.getEmail(), subject, content, false, true);</span>
+<span class="nc" id="L101">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.7.201606060606</span></div></body></html>

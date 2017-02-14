@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="fr"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MeasurePropertyResource.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Measure Platform</a> &gt; <a href="index.source.html" class="el_package">org.measure.platform.restapi.app.entitys</a> &gt; <span class="el_source">MeasurePropertyResource.java</span></div><h1>MeasurePropertyResource.java</h1><pre class="source lang-java linenums">package org.measure.platform.restapi.app.entitys;
+
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.List;
+import java.util.Optional;
+
+import javax.inject.Inject;
+import javax.validation.Valid;
+
+import org.measure.platform.core.api.entitys.MeasureInstanceService;
+import org.measure.platform.core.api.entitys.MeasurePropertyService;
+import org.measure.platform.core.entity.MeasureProperty;
+import org.measure.platform.restapi.framework.rest.util.HeaderUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.codahale.metrics.annotation.Timed;
+
+/**
+ * REST controller for managing MeasureProperty.
+ */
+@RestController
+@RequestMapping(&quot;/api&quot;)
+<span class="nc" id="L35">public class MeasurePropertyResource {</span>
+
+<span class="nc" id="L37">    private final Logger log = LoggerFactory.getLogger(MeasurePropertyResource.class);</span>
+        
+    @Inject
+    private MeasurePropertyService measurePropertyService;
+    
+    @Inject
+    private MeasureInstanceService measureInstanceService;
+
+    /**
+     * POST  /measure-properties : Create a new measureProperty.
+     *
+     * @param measureProperty the measureProperty to create
+     * @return the ResponseEntity with status 201 (Created) and with body the new measureProperty, or with status 400 (Bad Request) if the measureProperty has already an ID
+     * @throws URISyntaxException if the Location URI syntax is incorrect
+     */
+    @PostMapping(&quot;/measure-properties&quot;)
+    @Timed
+    public ResponseEntity&lt;MeasureProperty&gt; createMeasureProperty(@Valid @RequestBody MeasureProperty measureProperty) throws URISyntaxException {
+<span class="nc" id="L55">        log.debug(&quot;REST request to save MeasureProperty : {}&quot;, measureProperty);</span>
+<span class="nc bnc" id="L56" title="All 2 branches missed.">        if (measureProperty.getId() != null) {</span>
+<span class="nc" id="L57">            return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(&quot;measureProperty&quot;, &quot;idexists&quot;, &quot;A new measureProperty cannot already have an ID&quot;)).body(null);</span>
+        }
+<span class="nc" id="L59">        MeasureProperty result = measurePropertyService.save(measureProperty);</span>
+<span class="nc" id="L60">        return ResponseEntity.created(new URI(&quot;/api/measure-properties/&quot; + result.getId()))</span>
+<span class="nc" id="L61">            .headers(HeaderUtil.createEntityCreationAlert(&quot;measureProperty&quot;, result.getId().toString()))</span>
+<span class="nc" id="L62">            .body(result);</span>
+    }
+
+    /**
+     * PUT  /measure-properties : Updates an existing measureProperty.
+     *
+     * @param measureProperty the measureProperty to update
+     * @return the ResponseEntity with status 200 (OK) and with body the updated measureProperty,
+     * or with status 400 (Bad Request) if the measureProperty is not valid,
+     * or with status 500 (Internal Server Error) if the measureProperty couldnt be updated
+     * @throws URISyntaxException if the Location URI syntax is incorrect
+     */
+    @PutMapping(&quot;/measure-properties&quot;)
+    @Timed
+    public ResponseEntity&lt;MeasureProperty&gt; updateMeasureProperty(@Valid @RequestBody MeasureProperty measureProperty) throws URISyntaxException {
+<span class="nc" id="L77">        log.debug(&quot;REST request to update MeasureProperty : {}&quot;, measureProperty);</span>
+<span class="nc bnc" id="L78" title="All 2 branches missed.">        if (measureProperty.getId() == null) {</span>
+<span class="nc" id="L79">            return createMeasureProperty(measureProperty);</span>
+        }
+<span class="nc" id="L81">        MeasureProperty result = measurePropertyService.save(measureProperty);</span>
+<span class="nc" id="L82">        return ResponseEntity.ok()</span>
+<span class="nc" id="L83">            .headers(HeaderUtil.createEntityUpdateAlert(&quot;measureProperty&quot;, measureProperty.getId().toString()))</span>
+<span class="nc" id="L84">            .body(result);</span>
+    }
+
+    /**
+     * GET  /measure-properties : get all the measureProperties.
+     *
+     * @return the ResponseEntity with status 200 (OK) and the list of measureProperties in body
+     */
+    @GetMapping(&quot;/measure-properties&quot;)
+    @Timed
+    public List&lt;MeasureProperty&gt; getAllMeasureProperties() {
+<span class="nc" id="L95">        log.debug(&quot;REST request to get all MeasureProperties&quot;);</span>
+<span class="nc" id="L96">        return measurePropertyService.findAll();</span>
+    }
+
+    /**
+     * GET  /measure-properties/:id : get the &quot;id&quot; measureProperty.
+     *
+     * @param id the id of the measureProperty to retrieve
+     * @return the ResponseEntity with status 200 (OK) and with body the measureProperty, or with status 404 (Not Found)
+     */
+    @GetMapping(&quot;/measure-properties/{id}&quot;)
+    @Timed
+    public ResponseEntity&lt;MeasureProperty&gt; getMeasureProperty(@PathVariable Long id) {
+<span class="nc" id="L108">        log.debug(&quot;REST request to get MeasureProperty : {}&quot;, id);</span>
+<span class="nc" id="L109">        MeasureProperty measureProperty = measurePropertyService.findOne(id);</span>
+<span class="nc" id="L110">        return Optional.ofNullable(measureProperty)</span>
+<span class="nc" id="L111">            .map(result -&gt; new ResponseEntity&lt;&gt;(</span>
+                result,
+                HttpStatus.OK))
+<span class="nc" id="L114">            .orElse(new ResponseEntity&lt;&gt;(HttpStatus.NOT_FOUND));</span>
+    }
+
+    /**
+     * DELETE  /measure-properties/:id : delete the &quot;id&quot; measureProperty.
+     *
+     * @param id the id of the measureProperty to delete
+     * @return the ResponseEntity with status 200 (OK)
+     */
+    @DeleteMapping(&quot;/measure-properties/{id}&quot;)
+    @Timed
+    public ResponseEntity&lt;Void&gt; deleteMeasureProperty(@PathVariable Long id) {
+<span class="nc" id="L126">        log.debug(&quot;REST request to delete MeasureProperty : {}&quot;, id);</span>
+<span class="nc" id="L127">        measurePropertyService.delete(id);</span>
+<span class="nc" id="L128">        return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(&quot;measureProperty&quot;, id.toString())).build();</span>
+    }
+    
+    /**
+     * GET  /measure-properties : get all the measureProperties.
+     *
+     * @return the ResponseEntity with status 200 (OK) and the list of measureProperties in body
+     */
+    @GetMapping(&quot;/measure-properties/byinstance/{id}&quot;)
+    @Timed
+    public List&lt;MeasureProperty&gt; getMeasurePropertiesByInstanceId(@PathVariable Long id) {	
+<span class="nc" id="L139">    	return measurePropertyService.findByInstance(measureInstanceService.findOne(id));</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.7.201606060606</span></div></body></html>

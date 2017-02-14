@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="fr"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>CustomAuditEventRepository.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Measure Platform</a> &gt; <a href="index.source.html" class="el_package">org.measure.platform.core.impl.repository</a> &gt; <span class="el_source">CustomAuditEventRepository.java</span></div><h1>CustomAuditEventRepository.java</h1><pre class="source lang-java linenums">package org.measure.platform.core.impl.repository;
+
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.Date;
+import java.util.List;
+
+import javax.inject.Inject;
+
+import org.measure.platform.framework.config.audit.AuditEventConverter;
+import org.measure.platform.framework.domain.PersistentAuditEvent;
+import org.springframework.boot.actuate.audit.AuditEvent;
+import org.springframework.boot.actuate.audit.AuditEventRepository;
+import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+
+/**
+ * An implementation of Spring Boot's AuditEventRepository.
+ */
+@Repository
+<span class="nc" id="L23">public class CustomAuditEventRepository implements AuditEventRepository {</span>
+
+    private static final String AUTHORIZATION_FAILURE = &quot;AUTHORIZATION_FAILURE&quot;;
+
+    private static final String ANONYMOUS_USER = &quot;anonymoususer&quot;;
+
+    @Inject
+    private PersistenceAuditEventRepository persistenceAuditEventRepository;
+
+    @Inject
+    private AuditEventConverter auditEventConverter;
+
+    @Override
+    public List&lt;AuditEvent&gt; find(Date after) {
+<span class="nc" id="L37">        Iterable&lt;PersistentAuditEvent&gt; persistentAuditEvents =</span>
+<span class="nc" id="L38">            persistenceAuditEventRepository.findByAuditEventDateAfter(LocalDateTime.from(after.toInstant()));</span>
+<span class="nc" id="L39">        return auditEventConverter.convertToAuditEvent(persistentAuditEvents);</span>
+    }
+
+    @Override
+    public List&lt;AuditEvent&gt; find(String principal, Date after) {
+        Iterable&lt;PersistentAuditEvent&gt; persistentAuditEvents;
+<span class="nc bnc" id="L45" title="All 4 branches missed.">        if (principal == null &amp;&amp; after == null) {</span>
+<span class="nc" id="L46">            persistentAuditEvents = persistenceAuditEventRepository.findAll();</span>
+<span class="nc bnc" id="L47" title="All 2 branches missed.">        } else if (after == null) {</span>
+<span class="nc" id="L48">            persistentAuditEvents = persistenceAuditEventRepository.findByPrincipal(principal);</span>
+        } else {
+<span class="nc" id="L50">            persistentAuditEvents =</span>
+<span class="nc" id="L51">                persistenceAuditEventRepository.findByPrincipalAndAuditEventDateAfter(principal, LocalDateTime.from(after.toInstant()));</span>
+        }
+<span class="nc" id="L53">        return auditEventConverter.convertToAuditEvent(persistentAuditEvents);</span>
+    }
+
+    @Override
+    public List&lt;AuditEvent&gt; find(String principal, Date after, String type) {
+<span class="nc" id="L58">        Iterable&lt;PersistentAuditEvent&gt; persistentAuditEvents =</span>
+<span class="nc" id="L59">            persistenceAuditEventRepository.findByPrincipalAndAuditEventDateAfterAndAuditEventType(principal, LocalDateTime.from(after.toInstant()), type);</span>
+<span class="nc" id="L60">        return auditEventConverter.convertToAuditEvent(persistentAuditEvents);</span>
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void add(AuditEvent event) {
+<span class="nc bnc" id="L66" title="All 2 branches missed.">        if (!AUTHORIZATION_FAILURE.equals(event.getType()) &amp;&amp;</span>
+<span class="nc bnc" id="L67" title="All 2 branches missed.">            !ANONYMOUS_USER.equals(event.getPrincipal().toString())) {</span>
+
+<span class="nc" id="L69">            PersistentAuditEvent persistentAuditEvent = new PersistentAuditEvent();</span>
+<span class="nc" id="L70">            persistentAuditEvent.setPrincipal(event.getPrincipal());</span>
+<span class="nc" id="L71">            persistentAuditEvent.setAuditEventType(event.getType());</span>
+<span class="nc" id="L72">            Instant instant = Instant.ofEpochMilli(event.getTimestamp().getTime());</span>
+<span class="nc" id="L73">            persistentAuditEvent.setAuditEventDate(LocalDateTime.ofInstant(instant, ZoneId.systemDefault()));</span>
+<span class="nc" id="L74">            persistentAuditEvent.setData(auditEventConverter.convertDataToStrings(event.getData()));</span>
+<span class="nc" id="L75">            persistenceAuditEventRepository.save(persistentAuditEvent);</span>
+        }
+<span class="nc" id="L77">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.7.201606060606</span></div></body></html>

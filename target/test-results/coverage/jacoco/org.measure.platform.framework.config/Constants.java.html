@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="fr"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Constants.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Measure Platform</a> &gt; <a href="index.source.html" class="el_package">org.measure.platform.framework.config</a> &gt; <span class="el_source">Constants.java</span></div><h1>Constants.java</h1><pre class="source lang-java linenums">package org.measure.platform.framework.config;
+
+/**
+ * Application constants.
+ */
+public final class Constants {
+
+    //Regex for acceptable logins
+    public static final String LOGIN_REGEX = &quot;^[_'.@A-Za-z0-9-]*$&quot;;
+    // Spring profile for development and production, see http://jhipster.github.io/profiles/
+    public static final String SPRING_PROFILE_DEVELOPMENT = &quot;dev&quot;;
+    public static final String SPRING_PROFILE_PRODUCTION = &quot;prod&quot;;
+    // Spring profile used when deploying with Spring Cloud (used when deploying to CloudFoundry)
+    public static final String SPRING_PROFILE_CLOUD = &quot;cloud&quot;;
+    // Spring profile used when deploying to Heroku
+    public static final String SPRING_PROFILE_HEROKU = &quot;heroku&quot;;
+    // Spring profile used to disable swagger
+    public static final String SPRING_PROFILE_SWAGGER = &quot;swagger&quot;;
+    // Spring profile used to disable running liquibase
+    public static final String SPRING_PROFILE_NO_LIQUIBASE = &quot;no-liquibase&quot;;
+
+    public static final String SYSTEM_ACCOUNT = &quot;system&quot;;
+
+<span class="nc" id="L24">    private Constants() {</span>
+<span class="nc" id="L25">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.7.201606060606</span></div></body></html>

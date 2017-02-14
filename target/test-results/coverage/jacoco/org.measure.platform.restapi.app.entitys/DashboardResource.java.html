@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="fr"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>DashboardResource.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Measure Platform</a> &gt; <a href="index.source.html" class="el_package">org.measure.platform.restapi.app.entitys</a> &gt; <span class="el_source">DashboardResource.java</span></div><h1>DashboardResource.java</h1><pre class="source lang-java linenums">package org.measure.platform.restapi.app.entitys;
+
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.List;
+import java.util.Optional;
+
+import javax.inject.Inject;
+import javax.validation.Valid;
+
+import org.measure.platform.core.api.entitys.DashboardService;
+import org.measure.platform.core.entity.Dashboard;
+import org.measure.platform.restapi.framework.rest.util.HeaderUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.codahale.metrics.annotation.Timed;
+
+/**
+ * REST controller for managing Dashboard.
+ */
+@RestController
+@RequestMapping(&quot;/api&quot;)
+<span class="nc" id="L34">public class DashboardResource {</span>
+
+<span class="nc" id="L36">    private final Logger log = LoggerFactory.getLogger(DashboardResource.class);</span>
+        
+    @Inject
+    private DashboardService dashboardService;
+
+    /**
+     * POST  /dashboards : Create a new dashboard.
+     *
+     * @param dashboard the dashboard to create
+     * @return the ResponseEntity with status 201 (Created) and with body the new dashboard, or with status 400 (Bad Request) if the dashboard has already an ID
+     * @throws URISyntaxException if the Location URI syntax is incorrect
+     */
+    @PostMapping(&quot;/dashboards&quot;)
+    @Timed
+    public ResponseEntity&lt;Dashboard&gt; createDashboard(@Valid @RequestBody Dashboard dashboard) throws URISyntaxException {
+<span class="nc" id="L51">        log.debug(&quot;REST request to save Dashboard : {}&quot;, dashboard);</span>
+<span class="nc bnc" id="L52" title="All 2 branches missed.">        if (dashboard.getId() != null) {</span>
+<span class="nc" id="L53">            return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(&quot;dashboard&quot;, &quot;idexists&quot;, &quot;A new dashboard cannot already have an ID&quot;)).body(null);</span>
+        }
+<span class="nc" id="L55">        Dashboard result = dashboardService.save(dashboard);</span>
+<span class="nc" id="L56">        return ResponseEntity.created(new URI(&quot;/api/dashboards/&quot; + result.getId()))</span>
+<span class="nc" id="L57">            .headers(HeaderUtil.createEntityCreationAlert(&quot;dashboard&quot;, result.getId().toString()))</span>
+<span class="nc" id="L58">            .body(result);</span>
+    }
+
+    /**
+     * PUT  /dashboards : Updates an existing dashboard.
+     *
+     * @param dashboard the dashboard to update
+     * @return the ResponseEntity with status 200 (OK) and with body the updated dashboard,
+     * or with status 400 (Bad Request) if the dashboard is not valid,
+     * or with status 500 (Internal Server Error) if the dashboard couldnt be updated
+     * @throws URISyntaxException if the Location URI syntax is incorrect
+     */
+    @PutMapping(&quot;/dashboards&quot;)
+    @Timed
+    public ResponseEntity&lt;Dashboard&gt; updateDashboard(@Valid @RequestBody Dashboard dashboard) throws URISyntaxException {
+<span class="nc" id="L73">        log.debug(&quot;REST request to update Dashboard : {}&quot;, dashboard);</span>
+<span class="nc bnc" id="L74" title="All 2 branches missed.">        if (dashboard.getId() == null) {</span>
+<span class="nc" id="L75">            return createDashboard(dashboard);</span>
+        }
+<span class="nc" id="L77">        Dashboard result = dashboardService.save(dashboard);</span>
+<span class="nc" id="L78">        return ResponseEntity.ok()</span>
+<span class="nc" id="L79">            .headers(HeaderUtil.createEntityUpdateAlert(&quot;dashboard&quot;, dashboard.getId().toString()))</span>
+<span class="nc" id="L80">            .body(result);</span>
+    }
+
+    /**
+     * GET  /dashboards : get all the dashboards.
+     *
+     * @return the ResponseEntity with status 200 (OK) and the list of dashboards in body
+     */
+    @GetMapping(&quot;/dashboards&quot;)
+    @Timed
+    public List&lt;Dashboard&gt; getAllDashboards() {
+<span class="nc" id="L91">        log.debug(&quot;REST request to get all Dashboards&quot;);</span>
+<span class="nc" id="L92">        return dashboardService.findAll();</span>
+    }
+    
+    
+    @GetMapping(&quot;/dashboards/byphase/{id}&quot;)
+    @Timed
+    public List&lt;Dashboard&gt; getDashboardsByPhase(@PathVariable Long id) {
+<span class="nc" id="L99">        return dashboardService.findByPhase(id);</span>
+    }
+
+    
+    
+    /**
+     * GET  /dashboards/:id : get the &quot;id&quot; dashboard.
+     *
+     * @param id the id of the dashboard to retrieve
+     * @return the ResponseEntity with status 200 (OK) and with body the dashboard, or with status 404 (Not Found)
+     */
+    @GetMapping(&quot;/dashboards/{id}&quot;)
+    @Timed
+    public ResponseEntity&lt;Dashboard&gt; getDashboard(@PathVariable Long id) {
+<span class="nc" id="L113">        log.debug(&quot;REST request to get Dashboard : {}&quot;, id);</span>
+<span class="nc" id="L114">        Dashboard dashboard = dashboardService.findOne(id);</span>
+<span class="nc" id="L115">        return Optional.ofNullable(dashboard)</span>
+<span class="nc" id="L116">            .map(result -&gt; new ResponseEntity&lt;&gt;(</span>
+                result,
+                HttpStatus.OK))
+<span class="nc" id="L119">            .orElse(new ResponseEntity&lt;&gt;(HttpStatus.NOT_FOUND));</span>
+    }
+
+    /**
+     * DELETE  /dashboards/:id : delete the &quot;id&quot; dashboard.
+     *
+     * @param id the id of the dashboard to delete
+     * @return the ResponseEntity with status 200 (OK)
+     */
+    @DeleteMapping(&quot;/dashboards/{id}&quot;)
+    @Timed
+    public ResponseEntity&lt;Void&gt; deleteDashboard(@PathVariable Long id) {
+<span class="nc" id="L131">        log.debug(&quot;REST request to delete Dashboard : {}&quot;, id);</span>
+<span class="nc" id="L132">        dashboardService.delete(id);</span>
+<span class="nc" id="L133">        return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(&quot;dashboard&quot;, id.toString())).build();</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.7.201606060606</span></div></body></html>

@@ -1,0 +1,467 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="fr"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>JHipsterProperties.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Measure Platform</a> &gt; <a href="index.source.html" class="el_package">org.measure.platform.framework.config</a> &gt; <span class="el_source">JHipsterProperties.java</span></div><h1>JHipsterProperties.java</h1><pre class="source lang-java linenums">package org.measure.platform.framework.config;
+
+import javax.validation.constraints.NotNull;
+
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.web.cors.CorsConfiguration;
+
+/**
+ * Properties specific to JHipster.
+ *
+ * &lt;p&gt;
+ *     Properties are configured in the application.yml file.
+ * &lt;/p&gt;
+ */
+@ConfigurationProperties(prefix = &quot;jhipster&quot;, ignoreUnknownFields = false)
+<span class="fc" id="L16">public class JHipsterProperties {</span>
+
+<span class="fc" id="L18">    private final Async async = new Async();</span>
+
+<span class="fc" id="L20">    private final Http http = new Http();</span>
+
+<span class="fc" id="L22">    private final Cache cache = new Cache();</span>
+
+<span class="fc" id="L24">    private final Mail mail = new Mail();</span>
+
+<span class="fc" id="L26">    private final Security security = new Security();</span>
+
+<span class="fc" id="L28">    private final Swagger swagger = new Swagger();</span>
+
+<span class="fc" id="L30">    private final Metrics metrics = new Metrics();</span>
+
+<span class="fc" id="L32">    private final CorsConfiguration cors = new CorsConfiguration();</span>
+
+<span class="fc" id="L34">    private final Ribbon ribbon = new Ribbon();</span>
+
+    public Async getAsync() {
+<span class="fc" id="L37">        return async;</span>
+    }
+
+    public Http getHttp() {
+<span class="nc" id="L41">        return http;</span>
+    }
+
+    public Cache getCache() {
+<span class="nc" id="L45">        return cache;</span>
+    }
+
+    public Mail getMail() {
+<span class="nc" id="L49">        return mail;</span>
+    }
+
+    public Security getSecurity() {
+<span class="fc" id="L53">        return security;</span>
+    }
+
+    public Swagger getSwagger() {
+<span class="fc" id="L57">        return swagger;</span>
+    }
+
+    public Metrics getMetrics() {
+<span class="fc" id="L61">        return metrics;</span>
+    }
+
+    public CorsConfiguration getCors() {
+<span class="nc" id="L65">        return cors;</span>
+    }
+
+    public Ribbon getRibbon() {
+<span class="nc" id="L69">        return ribbon;</span>
+    }
+
+<span class="fc" id="L72">    public static class Async {</span>
+
+<span class="fc" id="L74">        private int corePoolSize = 2;</span>
+
+<span class="fc" id="L76">        private int maxPoolSize = 50;</span>
+
+<span class="fc" id="L78">        private int queueCapacity = 10000;</span>
+
+        public int getCorePoolSize() {
+<span class="fc" id="L81">            return corePoolSize;</span>
+        }
+
+        public void setCorePoolSize(int corePoolSize) {
+<span class="fc" id="L85">            this.corePoolSize = corePoolSize;</span>
+<span class="fc" id="L86">        }</span>
+
+        public int getMaxPoolSize() {
+<span class="fc" id="L89">            return maxPoolSize;</span>
+        }
+
+        public void setMaxPoolSize(int maxPoolSize) {
+<span class="fc" id="L93">            this.maxPoolSize = maxPoolSize;</span>
+<span class="fc" id="L94">        }</span>
+
+        public int getQueueCapacity() {
+<span class="fc" id="L97">            return queueCapacity;</span>
+        }
+
+        public void setQueueCapacity(int queueCapacity) {
+<span class="fc" id="L101">            this.queueCapacity = queueCapacity;</span>
+<span class="fc" id="L102">        }</span>
+    }
+
+<span class="fc" id="L105">    public static class Http {</span>
+
+<span class="fc" id="L107">        private final Cache cache = new Cache();</span>
+
+        public Cache getCache() {
+<span class="nc" id="L110">            return cache;</span>
+        }
+
+<span class="fc" id="L113">        public static class Cache {</span>
+
+<span class="fc" id="L115">            private int timeToLiveInDays = 1461;</span>
+
+            public int getTimeToLiveInDays() {
+<span class="nc" id="L118">                return timeToLiveInDays;</span>
+            }
+
+            public void setTimeToLiveInDays(int timeToLiveInDays) {
+<span class="nc" id="L122">                this.timeToLiveInDays = timeToLiveInDays;</span>
+<span class="nc" id="L123">            }</span>
+        }
+    }
+
+<span class="fc" id="L127">    public static class Cache {</span>
+<span class="fc" id="L128">        private final Ehcache ehcache = new Ehcache();</span>
+
+        public Ehcache getEhcache() {
+<span class="nc" id="L131">            return ehcache;</span>
+        }
+
+<span class="fc" id="L134">        public static class Ehcache {</span>
+
+<span class="fc" id="L136">            private String maxBytesLocalHeap = &quot;16M&quot;;</span>
+
+            public String getMaxBytesLocalHeap() {
+<span class="nc" id="L139">                return maxBytesLocalHeap;</span>
+            }
+
+            public void setMaxBytesLocalHeap(String maxBytesLocalHeap) {
+<span class="nc" id="L143">                this.maxBytesLocalHeap = maxBytesLocalHeap;</span>
+<span class="nc" id="L144">            }</span>
+        }
+    }
+
+<span class="fc" id="L148">    public static class Mail {</span>
+
+<span class="fc" id="L150">        private String from = &quot;MeasurePlatform@localhost&quot;;</span>
+
+        public String getFrom() {
+<span class="nc" id="L153">            return from;</span>
+        }
+
+        public void setFrom(String from) {
+<span class="nc" id="L157">            this.from = from;</span>
+<span class="nc" id="L158">        }</span>
+    }
+
+<span class="fc" id="L161">    public static class Security {</span>
+
+<span class="fc" id="L163">        private final RememberMe rememberMe = new RememberMe();</span>
+
+        public RememberMe getRememberMe() {
+<span class="fc" id="L166">            return rememberMe;</span>
+        }
+
+<span class="fc" id="L169">        public static class RememberMe {</span>
+
+            @NotNull
+            private String key;
+
+            public String getKey() {
+<span class="fc" id="L175">                return key;</span>
+            }
+
+            public void setKey(String key) {
+<span class="fc" id="L179">                this.key = key;</span>
+<span class="fc" id="L180">            }</span>
+        }
+    }
+
+<span class="fc" id="L184">    public static class Swagger {</span>
+
+<span class="fc" id="L186">        private String title = &quot;MeasurePlatform API&quot;;</span>
+
+<span class="fc" id="L188">        private String description = &quot;MeasurePlatform API documentation&quot;;</span>
+
+<span class="fc" id="L190">        private String version = &quot;0.0.1&quot;;</span>
+
+        private String termsOfServiceUrl;
+
+        private String contactName;
+
+        private String contactUrl;
+
+        private String contactEmail;
+
+        private String license;
+
+        private String licenseUrl;
+
+        public String getTitle() {
+<span class="fc" id="L205">            return title;</span>
+        }
+
+        public void setTitle(String title) {
+<span class="fc" id="L209">            this.title = title;</span>
+<span class="fc" id="L210">        }</span>
+
+        public String getDescription() {
+<span class="fc" id="L213">            return description;</span>
+        }
+
+        public void setDescription(String description) {
+<span class="fc" id="L217">            this.description = description;</span>
+<span class="fc" id="L218">        }</span>
+
+        public String getVersion() {
+<span class="fc" id="L221">            return version;</span>
+        }
+
+        public void setVersion(String version) {
+<span class="fc" id="L225">            this.version = version;</span>
+<span class="fc" id="L226">        }</span>
+
+        public String getTermsOfServiceUrl() {
+<span class="fc" id="L229">            return termsOfServiceUrl;</span>
+        }
+
+        public void setTermsOfServiceUrl(String termsOfServiceUrl) {
+<span class="fc" id="L233">            this.termsOfServiceUrl = termsOfServiceUrl;</span>
+<span class="fc" id="L234">        }</span>
+
+        public String getContactName() {
+<span class="fc" id="L237">            return contactName;</span>
+        }
+
+        public void setContactName(String contactName) {
+<span class="fc" id="L241">            this.contactName = contactName;</span>
+<span class="fc" id="L242">        }</span>
+
+        public String getContactUrl() {
+<span class="fc" id="L245">            return contactUrl;</span>
+        }
+
+        public void setContactUrl(String contactUrl) {
+<span class="fc" id="L249">            this.contactUrl = contactUrl;</span>
+<span class="fc" id="L250">        }</span>
+
+        public String getContactEmail() {
+<span class="fc" id="L253">            return contactEmail;</span>
+        }
+
+        public void setContactEmail(String contactEmail) {
+<span class="fc" id="L257">            this.contactEmail = contactEmail;</span>
+<span class="fc" id="L258">        }</span>
+
+        public String getLicense() {
+<span class="fc" id="L261">            return license;</span>
+        }
+
+        public void setLicense(String license) {
+<span class="fc" id="L265">            this.license = license;</span>
+<span class="fc" id="L266">        }</span>
+
+        public String getLicenseUrl() {
+<span class="fc" id="L269">            return licenseUrl;</span>
+        }
+
+        public void setLicenseUrl(String licenseUrl) {
+<span class="fc" id="L273">            this.licenseUrl = licenseUrl;</span>
+<span class="fc" id="L274">        }</span>
+    }
+
+<span class="fc" id="L277">    public static class Metrics {</span>
+
+<span class="fc" id="L279">        private final Jmx jmx = new Jmx();</span>
+
+<span class="fc" id="L281">        private final Spark spark = new Spark();</span>
+
+<span class="fc" id="L283">        private final Graphite graphite = new Graphite();</span>
+
+<span class="fc" id="L285">        private final Logs logs = new Logs();</span>
+
+        public Jmx getJmx() {
+<span class="fc" id="L288">            return jmx;</span>
+        }
+
+        public Spark getSpark() {
+<span class="nc" id="L292">            return spark;</span>
+        }
+
+        public Graphite getGraphite() {
+<span class="nc" id="L296">            return graphite;</span>
+        }
+
+        public Logs getLogs() {
+<span class="fc" id="L300">            return logs;</span>
+        }
+
+<span class="fc" id="L303">        public static class Jmx {</span>
+
+<span class="fc" id="L305">            private boolean enabled = true;</span>
+
+            public boolean isEnabled() {
+<span class="fc" id="L308">                return enabled;</span>
+            }
+
+            public void setEnabled(boolean enabled) {
+<span class="fc" id="L312">                this.enabled = enabled;</span>
+<span class="fc" id="L313">            }</span>
+        }
+
+<span class="fc" id="L316">        public static class Spark {</span>
+
+<span class="fc" id="L318">            private boolean enabled = false;</span>
+
+<span class="fc" id="L320">            private String host = &quot;localhost&quot;;</span>
+
+<span class="fc" id="L322">            private int port = 9999;</span>
+
+            public boolean isEnabled() {
+<span class="nc" id="L325">                return enabled;</span>
+            }
+
+            public void setEnabled(boolean enabled) {
+<span class="nc" id="L329">                this.enabled = enabled;</span>
+<span class="nc" id="L330">            }</span>
+
+            public String getHost() {
+<span class="nc" id="L333">                return host;</span>
+            }
+
+            public void setHost(String host) {
+<span class="nc" id="L337">                this.host = host;</span>
+<span class="nc" id="L338">            }</span>
+
+            public int getPort() {
+<span class="nc" id="L341">                return port;</span>
+            }
+
+            public void setPort(int port) {
+<span class="nc" id="L345">                this.port = port;</span>
+<span class="nc" id="L346">            }</span>
+        }
+
+<span class="fc" id="L349">        public static class Graphite {</span>
+
+<span class="fc" id="L351">            private boolean enabled = false;</span>
+
+<span class="fc" id="L353">            private String host = &quot;localhost&quot;;</span>
+
+<span class="fc" id="L355">            private int port = 2003;</span>
+
+<span class="fc" id="L357">            private String prefix = &quot;MeasurePlatform&quot;;</span>
+
+            public boolean isEnabled() {
+<span class="nc" id="L360">                return enabled;</span>
+            }
+
+            public void setEnabled(boolean enabled) {
+<span class="nc" id="L364">                this.enabled = enabled;</span>
+<span class="nc" id="L365">            }</span>
+
+            public String getHost() {
+<span class="nc" id="L368">                return host;</span>
+            }
+
+            public void setHost(String host) {
+<span class="nc" id="L372">                this.host = host;</span>
+<span class="nc" id="L373">            }</span>
+
+            public int getPort() {
+<span class="nc" id="L376">                return port;</span>
+            }
+
+            public void setPort(int port) {
+<span class="nc" id="L380">                this.port = port;</span>
+<span class="nc" id="L381">            }</span>
+
+            public String getPrefix() {
+<span class="nc" id="L384">                return prefix;</span>
+            }
+
+            public void setPrefix(String prefix) {
+<span class="nc" id="L388">                this.prefix = prefix;</span>
+<span class="nc" id="L389">            }</span>
+        }
+
+<span class="fc" id="L392">        public static  class Logs {</span>
+
+<span class="fc" id="L394">            private boolean enabled = false;</span>
+
+<span class="fc" id="L396">            private long reportFrequency = 60;</span>
+
+            public long getReportFrequency() {
+<span class="nc" id="L399">                return reportFrequency;</span>
+            }
+
+            public void setReportFrequency(int reportFrequency) {
+<span class="nc" id="L403">                this.reportFrequency = reportFrequency;</span>
+<span class="nc" id="L404">            }</span>
+
+            public boolean isEnabled() {
+<span class="fc" id="L407">                return enabled;</span>
+            }
+
+            public void setEnabled(boolean enabled) {
+<span class="nc" id="L411">                this.enabled = enabled;</span>
+<span class="nc" id="L412">            }</span>
+        }
+    }
+
+<span class="fc" id="L416">    private final Logging logging = new Logging();</span>
+
+<span class="nc" id="L418">    public Logging getLogging() { return logging; }</span>
+
+<span class="fc" id="L420">    public static class Logging {</span>
+
+<span class="fc" id="L422">        private final Logstash logstash = new Logstash();</span>
+
+<span class="nc" id="L424">        public Logstash getLogstash() { return logstash; }</span>
+
+<span class="fc" id="L426">        public static class Logstash {</span>
+
+<span class="fc" id="L428">            private boolean enabled = false;</span>
+
+<span class="fc" id="L430">            private String host = &quot;localhost&quot;;</span>
+
+<span class="fc" id="L432">            private int port = 5000;</span>
+
+<span class="fc" id="L434">            private int queueSize = 512;</span>
+
+<span class="nc" id="L436">            public boolean isEnabled() { return enabled; }</span>
+
+<span class="nc" id="L438">            public void setEnabled(boolean enabled) { this.enabled = enabled; }</span>
+
+<span class="nc" id="L440">            public String getHost() { return host; }</span>
+
+<span class="nc" id="L442">            public void setHost(String host) { this.host = host; }</span>
+
+<span class="nc" id="L444">            public int getPort() { return port; }</span>
+
+<span class="nc" id="L446">            public void setPort(int port) { this.port = port; }</span>
+
+<span class="nc" id="L448">            public int getQueueSize() { return queueSize; }</span>
+
+<span class="nc" id="L450">            public void setQueueSize(int queueSize) { this.queueSize = queueSize; }</span>
+        }
+    }
+
+<span class="fc" id="L454">    public static class Ribbon {</span>
+
+        private String[] displayOnActiveProfiles;
+
+        public String[] getDisplayOnActiveProfiles() {
+<span class="nc" id="L459">            return displayOnActiveProfiles;</span>
+        }
+
+        public void setDisplayOnActiveProfiles(String[] displayOnActiveProfiles) {
+<span class="nc" id="L463">            this.displayOnActiveProfiles = displayOnActiveProfiles;</span>
+<span class="nc" id="L464">        }</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.7.201606060606</span></div></body></html>
