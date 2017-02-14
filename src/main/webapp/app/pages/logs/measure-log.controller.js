@@ -11,12 +11,18 @@
 		var vm = this;
 
 		vm.logs = [];
+		
+		vm.kibanaadress = null;
 
 		loadAll();
 			
 		function loadAll() {
 			MeasureLogService.alllogs(function(result) {
 				vm.logs = result;
+			});
+			
+			MeasureLogService.kibanaadress(function(result) {
+				vm.kibanaadress = result;
 			});
 		}
 		

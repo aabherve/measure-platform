@@ -22,8 +22,8 @@
 						class="glyphicon glyphicon-scale"></span>&nbsp; <span>Projects</span>
 				</a></li>
 				<li ng-class="{active: vm.$state.includes('account')}" uib-dropdown
-					class="dropdown pointer"><a class="dropdown-toggle"
-					uib-dropdown-toggle href="" id="account-menu"> <span> <span
+					class="dropdown pointer" ng-switch-when="true"><a class="dropdown-toggle"
+					uib-dropdown-toggle href="" id="account-menu" > <span> <span
 							class="glyphicon glyphicon-th-list"></span> <span
 							class="hidden-sm"> Measures </span> <b class="caret"></b>
 					</span>
@@ -42,7 +42,7 @@
 					</ul></li>
 
 				<li ng-class="{active: vm.$state.includes('account')}" uib-dropdown
-					class="dropdown pointer"><a class="dropdown-toggle"
+					class="dropdown pointer" ng-switch-when="true"><a class="dropdown-toggle"
 					uib-dropdown-toggle href="" id="account-menu"> <span> <span
 							class="glyphicon glyphicon-cog"></span> <span class="hidden-sm">Platform</span>
 							<b class="caret"></b>

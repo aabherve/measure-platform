@@ -9,7 +9,11 @@
 
 		return $resource(resourceUrl, {}, {
 			'alllogs' : {
-				url : 'api/measure-logger//measure-execution',
+				url : 'api/measure-logger/measure-execution',
+				method : 'GET',
+				isArray : true
+			},'kibanaadress' : {
+				url : 'api/configuration/kibana-adress',
 				method : 'GET',
 				isArray : true
 			}

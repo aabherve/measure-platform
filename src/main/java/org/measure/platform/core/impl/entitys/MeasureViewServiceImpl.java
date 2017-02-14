@@ -17,6 +17,7 @@ import org.measure.platform.core.impl.repository.MeasureViewRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cglib.core.Local;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
@@ -48,6 +49,8 @@ public class MeasureViewServiceImpl implements MeasureViewService{
     @Autowired
     private MessageSource messageSource;
     
+	@Value("${measure.kibana.adress}")
+	private String kibanaAdress;
 
     /**
      * Save a measureView.
@@ -89,7 +92,7 @@ public class MeasureViewServiceImpl implements MeasureViewService{
 				font = "120";
 			}
 			
-			String value =   messageSource.getMessage("viewtype.view2", new Object[]{"metric",refresh,periode,measure,font,height,width}, Locale.ENGLISH);    	
+			String value =   messageSource.getMessage("viewtype.view2", new Object[]{"metric",refresh,periode,measure,font,height,width,kibanaAdress}, Locale.ENGLISH);    	
 			measureView.setViewData(value);		
 		}else{
 			if(measureView.getType().equals("Line chart")){
@@ -143,7 +146,7 @@ public class MeasureViewServiceImpl implements MeasureViewService{
 				height = "800";
 			}
 			
-			String value =   messageSource.getMessage("viewtype.view1", new Object[]{type,refresh,periode,measure,color,interval,height,width}, Locale.ENGLISH);    	
+			String value =   messageSource.getMessage("viewtype.view1", new Object[]{type,refresh,periode,measure,color,interval,height,width,kibanaAdress}, Locale.ENGLISH);    	
 			measureView.setViewData(value);		
 		}
 		

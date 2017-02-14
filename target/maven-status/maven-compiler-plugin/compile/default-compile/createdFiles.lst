@@ -39,6 +39,7 @@ org\measure\platform\framework\domain\util\JSR310PersistenceConverters$LocalDate
 org\measure\platform\restapi\app\entitys\PhaseResource.class
 org\measure\platform\core\impl\entitys\MeasureViewServiceImpl.class
 org\measure\platform\core\impl\repository\PhaseRepository.class
+org\measure\platform\restapi\app\services\ConfigurationResource.class
 org\measure\platform\framework\security\SpringSecurityAuditorAware.class
 org\measure\platform\core\impl\repository\MeasureReferenceRepository.class
 org\measure\platform\core\impl\entitys\ProjectServiceImpl.class
