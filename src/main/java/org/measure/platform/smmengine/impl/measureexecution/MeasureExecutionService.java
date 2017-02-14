@@ -117,8 +117,9 @@ public class MeasureExecutionService implements IMeasureExecutionService {
 		try {
 
 			if (measureData.isIsRemote()) {
-				List<IMeasurement> measurements = executeRemoteMeasure(measureData, new HashMap<String, String>(), log);
-
+				Map<String, String> updatedProperties = new HashMap<>();
+				List<IMeasurement> measurements = executeRemoteMeasure(measureData,updatedProperties, log);
+				storeUpdatedProperties(measureData, updatedProperties);
 				for (IMeasurement measurement : measurements) {
 					measurementStorage.putMeasurement(measureData.getInstanceName(),
 							measureData.isManageLastMeasurement(), measurement);
@@ -126,6 +127,7 @@ public class MeasureExecutionService implements IMeasureExecutionService {
 			} else {
 				IMeasure measureImpl = measureCatalogue.getMeasureImplementation(measureData.getMeasureName());
 				List<IMeasurement> measurements = executeLocalMeasure(measureData, measureImpl, log);
+				storeUpdatedProperties(measureData, measureImpl.getUpdatedProperties());
 
 				for (IMeasurement measurement : measurements) {
 					measurementStorage.putMeasurement(measureData.getInstanceName(),
