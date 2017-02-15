@@ -3,6 +3,7 @@ package org.measure.platform.core.impl.repository;
 import java.util.List;
 
 import org.measure.platform.core.entity.Dashboard;
+import org.measure.platform.core.entity.MeasureInstance;
 import org.measure.platform.core.entity.MeasureView;
 import org.measure.platform.core.entity.Phase;
 import org.measure.platform.core.entity.Project;
@@ -30,4 +31,8 @@ public interface MeasureViewRepository extends JpaRepository<MeasureView,Long> {
 	
 	@Query(value = "select i from MeasureView i where i.dashboard = :dashboard")
 	List<MeasureView> findByDashboard(@Param("dashboard")Dashboard dashboard);
+
+	@Query(value = "select i from MeasureView i where i.measureinstance = :minstance")
+	List<MeasureView> findByMeasure(@Param("minstance")MeasureInstance minstance);
+
 }

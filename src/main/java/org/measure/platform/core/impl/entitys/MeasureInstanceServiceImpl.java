@@ -8,10 +8,12 @@ import org.measure.platform.core.api.entitys.MeasureInstanceService;
 import org.measure.platform.core.entity.MeasureInstance;
 import org.measure.platform.core.entity.MeasureProperty;
 import org.measure.platform.core.entity.MeasureReference;
+import org.measure.platform.core.entity.MeasureView;
 import org.measure.platform.core.entity.Project;
 import org.measure.platform.core.impl.repository.MeasureInstanceRepository;
 import org.measure.platform.core.impl.repository.MeasurePropertyRepository;
 import org.measure.platform.core.impl.repository.MeasureReferenceRepository;
+import org.measure.platform.core.impl.repository.MeasureViewRepository;
 import org.measure.platform.core.impl.repository.ProjectRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,6 +37,9 @@ public class MeasureInstanceServiceImpl implements MeasureInstanceService {
 
 	@Inject
 	private MeasurePropertyRepository propertyRepository;
+	
+	@Inject
+	private MeasureViewRepository viewRepository;
 	
 	
 	@Inject
@@ -106,13 +111,12 @@ public class MeasureInstanceServiceImpl implements MeasureInstanceService {
 			propertyRepository.delete(prop);
 		}
 		
-		for(MeasureProperty prop : propertyRepository.findByMeasure(minstance)){
-			propertyRepository.delete(prop);
-		}
-		
-		
 		for(MeasureReference prop : referenceRepository.findByMeasure(minstance)){
 			referenceRepository.delete(prop);
+		}
+		
+		for(MeasureView prop : viewRepository.findByMeasure(minstance)){
+			viewRepository.delete(prop);
 		}
 		
 		measureInstanceRepository.delete(id);

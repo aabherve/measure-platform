@@ -16,6 +16,7 @@
 
 		</div>
 
+
 		<div style="float: right;">
 			<button class="btn btn-link"
 				ui-sref="appproject.edit({id:vm.project.id})">
@@ -35,7 +36,6 @@
 			</button>
 		</div>
 
-
 		<ol class="breadcrumb">
 			<li><a ui-sref="home">Home</a></li>
 			<li><a ui-sref="catalogue">Catalogue</a></li>
@@ -44,10 +44,15 @@
 		</ol>
 
 
-		<div style="display: inline-block; width: 100%;margin-left: 15px;">
+
+
+
+
+
+		<div style="display: inline-block; width: 100%; margin-left: 15px;">
 
 			<div ng-repeat="measureview in vm.project.measureview"
-				style="display: inline-block; padding: 0px; text-align: center;">
+				style="display: inline-block; padding: 0px; text-align: center;margin-right: 40px;">
 				<div class="row">
 					<div class="thumbnail" style="margin: 0px; text-align: center;">
 						<div ng-bind-html="measureview.viewData | to_trusted"></div>
@@ -80,9 +85,9 @@
 		</div>
 
 		<div class="page-header">
-			<h3 style="margin-top:10px">Phases</h3>
+			<h3 style="margin-top: 10px">Phases</h3>
 		</div>
-		<div style="float: right; margin-top: -40px">
+		<div style="float: right; margin-top: 0px">
 			<button class="btn btn-link"
 				ui-sref="appproject.newphase({id:vm.project.id})">
 				<span class="glyphicon glyphicon-plus" aria-hiden="true"></span>

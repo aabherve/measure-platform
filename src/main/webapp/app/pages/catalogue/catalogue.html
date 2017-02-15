@@ -4,16 +4,18 @@
 			<h1>Project Catalogue</h1>
 		</div>
 
-		<div style="float: right; margin-top: 0px">
-			<button class="btn btn-link" ui-sref="catalogue.newproject">
-				<span class="glyphicon glyphicon-plus" aria-hiden="true"></span>
-			</button>
-		</div>
+
 
 		<ol class="breadcrumb">
 			<li><a ui-sref="home">Home</a></li>
 			<li><a ui-sref="catalogue">Catalogue</a></li>
 		</ol>
+		
+		<div style="float: right; margin-top: 0px">
+			<button class="btn btn-link" ui-sref="catalogue.newproject">
+				<span class="glyphicon glyphicon-plus" aria-hiden="true"></span>
+			</button>
+		</div>
 
 		<div ng-repeat="project in vm.projects"
 			style="min-width: 300px; display: inline-block; margin: 10px;">
@@ -56,7 +58,7 @@
 
 							<div class="row" style="text-align: center;">
 								<div class="thumbnail"
-									style="border: none; margin: 20px; text-align: center;">
+									style="border: none; margin-right: 20px; margin-left: 20px;margin-bottom: 0px;margin-top: 0px; text-align: center;">
 									<div ng-bind-html="measureview.viewData | to_trusted"></div>
 									<div class="caption" style="text-align: center;padding:0px;">
 										<h3 style="margin: 0px;">{{measureview.name}}</h3>

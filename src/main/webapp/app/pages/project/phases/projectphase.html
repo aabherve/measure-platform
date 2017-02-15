@@ -16,16 +16,7 @@
 			<h4>{{vm.phase.phaseDescription}}</h4>
 		</div>
 
-		<div style="float: right; margin-top: -120px">
-			<button class="btn btn-link btn-lg"
-				ui-sref="projectphases.edit({phaseId:vm.phase.id})">
-				<span class="glyphicon glyphicon-pencil" aria-hiden="true"></span>
-			</button>
-			<button class="btn btn-link btn-lg"
-				ui-sref="projectphases.delete({phaseId:vm.phase.id})">
-				<span class="glyphicon glyphicon-remove" aria-hiden="true"></span>
-			</button>
-		</div>
+
 
 
 		<ol class="breadcrumb">
@@ -37,16 +28,27 @@
 					{{vm.phase.phaseName}}</a></li>
 		</ol>
 
+		<div style="float: right; margin-top: -38px">
+			<button class="btn btn-link"
+				ui-sref="projectphases.edit({phaseId:vm.phase.id})">
+				<span class="glyphicon glyphicon-pencil" aria-hiden="true"></span>
+			</button>
+			<button class="btn btn-link"
+				ui-sref="projectphases.delete({phaseId:vm.phase.id})">
+				<span class="glyphicon glyphicon-remove" aria-hiden="true"></span>
+			</button>
+		</div>
+
 		<ul class="nav nav-tabs">
 			<li role="presentation" ng-repeat="dashboard in vm.dashboards"
 				ng-class="vm.isActive($index)"><a
 				ng-click="vm.setActive($index)">{{dashboard.dashboardName}}</a></li>
 		</ul>
 
-		<div style="float: right; margin-top: -40px">
+		<div style="float: right; margin-top: -30px">
 			<div ng-if="!vm.dashboards[vm.selectedDashboard].isExternal"
 				style="float: right;">
-				<button class="btn btn-link btn-lg" ng-show="!vm.editdashboard"
+				<button class="btn btn-link" ng-show="!vm.editdashboard"
 					ng-click="vm.edition()">
 					<span class="glyphicon glyphicon-picture" aria-hiden="true"></span>
 				</button>
@@ -55,15 +57,15 @@
 					<span class="glyphicon glyphicon-picture" aria-hiden="true"></span>
 				</button>
 			</div>
-			<button class="btn btn-link btn-lg"
+			<button class="btn btn-link"
 				ui-sref="projectphases.newdashboard({phaseId:vm.phase.id})">
 				<span class="glyphicon glyphicon-plus" aria-hiden="true"></span>
 			</button>
-			<button class="btn btn-link btn-lg"
+			<button class="btn btn-link"
 				ui-sref="projectphases.editdashboard({dashboardid:vm.dashboards[vm.selectedDashboard].id})">
 				<span class="glyphicon glyphicon-pencil" aria-hiden="true"></span>
 			</button>
-			<button class="btn btn-link btn-lg"
+			<button class="btn btn-link"
 				ui-sref="projectphases.deletedashboard({dashboardid:vm.dashboards[vm.selectedDashboard].id})">
 				<span class="glyphicon glyphicon-remove" aria-hiden="true"></span>
 			</button>
@@ -79,12 +81,13 @@
 					ng-bind-html="vm.dashboards[vm.selectedDashboard].content| to_trusted"></div>
 			</div>
 
-			<div ng-if="!vm.dashboards[vm.selectedDashboard].isExternal" style="text-align: center;">
+			<div ng-if="!vm.dashboards[vm.selectedDashboard].isExternal">
 				<div
 					ng-repeat="measureview in vm.dashboards[vm.selectedDashboard].measureview"
-					style="display: inline-block; padding: 10px;text-align: center;">
+					style="display: inline-block; padding: 10px; text-align: center;">
 					<div class="row">
-						<div class="thumbnail" style="border: none; margin: 0px;text-align: center;">
+						<div class="thumbnail"
+							style="margin: 0px; text-align: center;margin-right: 5px;margin-left: 5px;">
 							<div ng-bind-html="measureview.viewData | to_trusted"></div>
 							<div class="caption" style="text-align: center;">
 								<h3 style="margin: 0px;">{{measureview.name}}</h3>
@@ -105,7 +108,7 @@
 
 				</div>
 				<div class="btn btn-default"
-					style="width: 256px; height: 256px; margin: 30px;vertical-align :top;"
+					style="width: 256px; height: 256px; margin: 30px; vertical-align: top;"
 					ng-show="vm.editdashboard"
 					ui-sref="projectphases.addgraphic({dashboardid:vm.dashboards[vm.selectedDashboard].id})">
 					<span class="glyphicon glyphicon-plus" aria-hiden="true"

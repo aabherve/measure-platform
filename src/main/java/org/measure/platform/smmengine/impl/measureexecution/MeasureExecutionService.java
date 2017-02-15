@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.inject.Inject;
 
@@ -55,31 +56,169 @@ public class MeasureExecutionService implements IMeasureExecutionService {
 		log.setMeasureName(measureData.getMeasureName());
 
 		try {
+
+			List<IMeasurement> measurements = new ArrayList<>();
 			if (measureData.isIsRemote()) {
-				Map<String, String> updatedProperties = new HashMap<>();
-				List<IMeasurement> measurements = executeRemoteMeasure(measureData, updatedProperties, log);
-				storeUpdatedProperties(measureData, updatedProperties);
-				for (IMeasurement measurement : measurements) {
-					measurementStorage.putMeasurement(measureData.getInstanceName(),
-							measureData.isManageLastMeasurement(), measurement);
-				}
-
+				measurements.addAll(executeRemoteMeasure(measureData, log,true));
 			} else {
-				List<IMeasurement> measurements = executeLocalMeasure(measureData, measureImpl, log);
-				for (IMeasurement measurement : measurements) {
-					measurementStorage.putMeasurement(measureData.getInstanceName(),
-							measureData.isManageLastMeasurement(), measurement);
-				}
-				storeUpdatedProperties(measureData, measureImpl.getUpdatedProperties());
+				measurements.addAll(executeLocalMeasure(measureData, measureImpl, log,true));
+			}
 
+			for (IMeasurement measurement : measurements) {
+				measurementStorage.putMeasurement(measureData.getInstanceName(), measureData.isManageLastMeasurement(),
+						measurement);
 			}
 		} catch (Exception e) {
-
 			log.setExceptionMessage(e.getMessage());
 			log.setSuccess(false);
 		}
 
 		return log;
+	}
+
+	@Override
+	public MeasureLog executeMeasure(Long measureInstanceId) {
+		MeasureInstance measureData = measureInstanceService.findOne(measureInstanceId);
+
+		MeasureLog log = new MeasureLog();
+		log.setExectionDate(new Date());
+		log.setMeasureInstanceName(measureData.getInstanceName());
+		log.setMeasureName(measureData.getMeasureName());
+
+		try {
+
+			List<IMeasurement> measurements = new ArrayList<>();
+			if (measureData.isIsRemote()) {
+				measurements.addAll(executeRemoteMeasure(measureData, log,true));
+			} else {
+				IMeasure measureImpl = measureCatalogue.getMeasureImplementation(measureData.getMeasureName());
+				measurements.addAll(executeLocalMeasure(measureData, measureImpl, log,true));
+			}
+
+			for (IMeasurement measurement : measurements) {
+				measurementStorage.putMeasurement(measureData.getInstanceName(), measureData.isManageLastMeasurement(),
+						measurement);
+			}
+		} catch (Exception e) {
+			log.setExceptionMessage(e.getMessage());
+			log.setSuccess(false);
+		}
+		
+		return log;
+	}
+
+	@Override
+	public MeasureLog testMeasure(Long measureInstanceId) {
+		MeasureInstance measureData = measureInstanceService.findOne(measureInstanceId);
+		MeasureLog log = new MeasureLog();
+
+		log.setExectionDate(new Date());
+		log.setMeasureInstanceName(measureData.getInstanceName());
+		log.setMeasureName(measureData.getMeasureName());
+
+		if (measureData.isIsRemote()) {
+			executeRemoteMeasure(measureData, log,false);
+		} else {
+			IMeasure measureImpl = measureCatalogue.getMeasureImplementation(measureData.getMeasureName());
+			executeLocalMeasure(measureData, measureImpl, log,false);
+		}
+		return log;
+	}
+
+	private List<IMeasurement> executeRemoteMeasure(MeasureInstance measure, MeasureLog log,boolean storeProp) {
+		RestTemplate restTemplate = new RestTemplate();
+		try {
+
+			String url = "http://" + measure.getRemoteAdress() + "/api/measure-agent/measure-execution";
+
+			RemoteMeasureInstanceData data = new RemoteMeasureInstanceData();
+			data.setInstanceName(measure.getInstanceName());
+			data.setMeasureName(measure.getMeasureName());
+
+			Map<String, String> properties = initialiseProperties(measure, null);
+			data.setProperties(properties);
+
+			RemoteExecutionResult result = restTemplate.postForObject(url, data, RemoteExecutionResult.class);
+
+			if (result != null) {
+				if (storeProp)
+					storeUpdatedProperties(measure,result.getUpdatedProperties());
+				
+				log.setLog(result.getExecutionLog());
+				return log.getMesurement();
+			} else {
+				log.setSuccess(false);
+				log.setExceptionMessage("No Result");
+			}
+		} catch (Exception e) {
+			log.setSuccess(false);
+			log.setExceptionMessage(e.getMessage());
+		}
+
+		return new ArrayList<>();
+	}
+
+	private List<IMeasurement> executeLocalMeasure(MeasureInstance measure, IMeasure measureImpl, MeasureLog log,boolean storeProp) {
+		try {
+
+			Map<String,String> properties = initialiseProperties(measure, log);
+			for (Entry<String, String> entry : properties.entrySet()) {
+				measureImpl.getProperties().put(entry.getKey(), entry.getValue());
+			}
+
+			Date start = new Date();
+			List<IMeasurement> measurements = new ArrayList<>();
+			if (measureImpl instanceof IDirectMeasure) {		
+				measurements.addAll(executeDirectMeasure((IDirectMeasure) measureImpl));
+			} else if (measureImpl instanceof IDerivedMeasure) {
+
+				List<MeasureReference> references = new ArrayList<>();
+				for (MeasureReference reference : measureReferenceService.findByInstance(measure)) {
+					references.add(reference);
+				}
+				measurements.addAll(executeDerivedMeasure((IDerivedMeasure) measureImpl, references, log));	
+			}
+			
+			if(storeProp){
+				Map<String,String> updatedProperties = new HashMap<>();
+				for(Entry<String,String> entry : measureImpl.getProperties().entrySet()){
+					if(!entry.getValue().equals(properties.get(entry.getKey()))){
+						updatedProperties.put(entry.getKey(), entry.getValue());
+					}
+				}
+				storeUpdatedProperties(measure,updatedProperties);
+			}
+			
+			log.setExecutionTime(new Date().getTime() - start.getTime());
+			log.setMesurement(measurements);
+			log.setSuccess(true);
+			
+			return measurements;
+			
+		} catch (Exception e) {
+			log.setSuccess(false);
+			log.setExceptionMessage(e.getMessage());
+			e.printStackTrace();
+		}
+		return new ArrayList<>();
+	}
+
+	private List<IMeasurement> executeDirectMeasure(IDirectMeasure directMeasure) throws Exception {
+		return directMeasure.getMeasurement();
+	}
+
+	private List<IMeasurement> executeDerivedMeasure(IDerivedMeasure derivedMeasure, List<MeasureReference> references,
+			MeasureLog log) throws Exception {
+		for (MeasureReference ref : references) {
+			List<IMeasurement> measurements = measurementStorage.getMeasurement(ref.getReferencedInstance().getInstanceName(), ref.getNumberRef(), ref.getFilterExpression());
+			for (IMeasurement measurement : measurements) {
+				derivedMeasure.addMeasureInput(ref.getReferencedInstance().getInstanceName(), ref.getRole(),measurement);
+				log.getInputs().add(log.new MeasureTestInput(ref.getRole(), measurement));
+			}
+		}
+
+		// Execute Measure
+		return derivedMeasure.calculateMeasurement();
 	}
 
 	private HashMap<String, String> initialiseProperties(MeasureInstance measureData, MeasureLog log) {
@@ -96,158 +235,10 @@ public class MeasureExecutionService implements IMeasureExecutionService {
 
 	private void storeUpdatedProperties(MeasureInstance measureData, Map<String, String> updatedProperties) {
 		for (MeasureProperty property : new ArrayList<>(measurePropertyService.findByInstance(measureData))) {
-			String updatedValue = updatedProperties.get(property.getPropertyName());
-			if (updatedValue != null) {
-				property.setPropertyValue(updatedValue);
+			if (updatedProperties.containsKey(property.getPropertyName())) {
+				property.setPropertyValue(updatedProperties.get(property.getPropertyName()));
 				measurePropertyService.save(property);
 			}
 		}
-
 	}
-
-	@Override
-	public MeasureLog executeMeasure(Long measureInstanceId) {
-		MeasureInstance measureData = measureInstanceService.findOne(measureInstanceId);
-		MeasureLog log = new MeasureLog();
-
-		log.setExectionDate(new Date());
-		log.setMeasureInstanceName(measureData.getInstanceName());
-		log.setMeasureName(measureData.getMeasureName());
-
-		try {
-
-			if (measureData.isIsRemote()) {
-				Map<String, String> updatedProperties = new HashMap<>();
-				List<IMeasurement> measurements = executeRemoteMeasure(measureData,updatedProperties, log);
-				storeUpdatedProperties(measureData, updatedProperties);
-				for (IMeasurement measurement : measurements) {
-					measurementStorage.putMeasurement(measureData.getInstanceName(),
-							measureData.isManageLastMeasurement(), measurement);
-				}
-			} else {
-				IMeasure measureImpl = measureCatalogue.getMeasureImplementation(measureData.getMeasureName());
-				List<IMeasurement> measurements = executeLocalMeasure(measureData, measureImpl, log);
-				storeUpdatedProperties(measureData, measureImpl.getUpdatedProperties());
-
-				for (IMeasurement measurement : measurements) {
-					measurementStorage.putMeasurement(measureData.getInstanceName(),
-							measureData.isManageLastMeasurement(), measurement);
-				}
-			}
-
-		} catch (Exception e) {
-
-			log.setExceptionMessage(e.getMessage());
-			log.setSuccess(false);
-		}
-		return log;
-	}
-
-	@Override
-	public MeasureLog testMeasure(Long measureInstanceId) {
-		MeasureInstance measureData = measureInstanceService.findOne(measureInstanceId);
-		MeasureLog log = new MeasureLog();
-
-		log.setExectionDate(new Date());
-		log.setMeasureInstanceName(measureData.getInstanceName());
-		log.setMeasureName(measureData.getMeasureName());
-
-		if (measureData.isIsRemote()) {
-			executeRemoteMeasure(measureData, new HashMap<String, String>(), log);
-		} else {
-			IMeasure measureImpl = measureCatalogue.getMeasureImplementation(measureData.getMeasureName());
-			executeLocalMeasure(measureData, measureImpl, log);
-		}
-		return log;
-	}
-
-	private List<IMeasurement> executeRemoteMeasure(MeasureInstance measure, Map<String, String> updatedProperties,
-			MeasureLog log) {
-		RestTemplate restTemplate = new RestTemplate();
-		try {
-
-			String url = "http://" + measure.getRemoteAdress() + "/api/measure-agent/measure-execution";
-
-			RemoteMeasureInstanceData data = new RemoteMeasureInstanceData();
-			data.setInstanceName(measure.getInstanceName());
-			data.setMeasureName(measure.getMeasureName());
-			data.setProperties(initialiseProperties(measure, null));
-
-			RemoteExecutionResult result = restTemplate.postForObject(url, data, RemoteExecutionResult.class);
-
-			if (result != null) {
-				updatedProperties.putAll(result.getUpdatedProperties());
-				log.setLog(result.getExecutionLog());
-				return log.getMesurement();
-			} else {
-				log.setSuccess(false);
-				log.setExceptionMessage("No Result");
-			}
-		} catch (Exception e) {
-
-			log.setSuccess(false);
-			log.setExceptionMessage(e.getMessage());
-			System.out.println("Log1 " + log.getExceptionMessage());
-			e.printStackTrace();
-		}
-
-		return new ArrayList<>();
-	}
-
-	private List<IMeasurement> executeLocalMeasure(MeasureInstance measure, IMeasure measureImpl, MeasureLog log) {
-		try {
-			measureImpl.setProperties(initialiseProperties(measure, log));
-
-			if (measureImpl instanceof IDirectMeasure) {
-				Date start = new Date();
-				List<IMeasurement> measurements = executeDirectMeasure((IDirectMeasure) measureImpl);
-				log.setExecutionTime(new Date().getTime() - start.getTime());
-				log.setMesurement(measurements);
-				log.setSuccess(true);
-				return measurements;
-			} else if (measureImpl instanceof IDerivedMeasure) {
-
-				List<MeasureReference> references = new ArrayList<>();
-				for (MeasureReference reference : measureReferenceService.findByInstance(measure)) {
-					references.add(reference);
-				}
-
-				Date start = new Date();
-				List<IMeasurement> measurements = executeDerivedMeasure((IDerivedMeasure) measureImpl, references, log);
-				log.setExecutionTime(new Date().getTime() - start.getTime());
-				log.setMesurement(measurements);
-				log.setSuccess(true);
-				return measurements;
-			}
-		} catch (Exception e) {
-			log.setSuccess(false);
-			log.setExceptionMessage(e.getMessage());
-			e.printStackTrace();
-		}
-
-		return new ArrayList<>();
-	}
-
-	private List<IMeasurement> executeDirectMeasure(IDirectMeasure directMeasure) throws Exception {
-		return directMeasure.getMeasurement();
-	}
-
-	private List<IMeasurement> executeDerivedMeasure(IDerivedMeasure derivedMeasure, List<MeasureReference> references,
-			MeasureLog log) throws Exception {
-		// Get Input Measurements
-		for (MeasureReference ref : references) {
-			System.out.println(ref.getFilterExpression());
-			List<IMeasurement> measurements = measurementStorage.getMeasurement(
-					ref.getReferencedInstance().getInstanceName(), ref.getNumberRef(), ref.getFilterExpression());
-			for (IMeasurement measurement : measurements) {
-				derivedMeasure.addMeasureInput(ref.getReferencedInstance().getInstanceName(), ref.getRole(),
-						measurement);
-				log.getInputs().add(log.new MeasureTestInput(ref.getRole(), measurement));
-			}
-		}
-
-		// Execute Measure
-		return derivedMeasure.calculateMeasurement();
-	}
-
 }

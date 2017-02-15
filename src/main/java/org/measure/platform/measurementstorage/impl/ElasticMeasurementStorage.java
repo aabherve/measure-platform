@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.inject.Inject;
 
@@ -52,7 +53,11 @@ public class ElasticMeasurementStorage implements IMeasurementStorage {
 			
 			IMeasurement measurement = new DefaultMeasurement();
 			try {
-				measurement.setValues(new ObjectMapper().readValue(sourceAsString, new TypeReference<Map<String, Object>>() {}));
+				
+				Map<String,Object> map = new ObjectMapper().readValue(sourceAsString, new TypeReference<Map<String, Object>>() {});
+ 				for(Entry<String,Object> entry : map.entrySet()){
+ 					measurement.getValues().put(entry.getKey(), entry.getValue());
+				}
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -89,7 +94,10 @@ public class ElasticMeasurementStorage implements IMeasurementStorage {
 			String sourceAsString = hit.getSourceAsString();
 			try {
 				IMeasurement measurement = new DefaultMeasurement();
-				measurement.setValues(new ObjectMapper().readValue(sourceAsString, new TypeReference<Map<String, Object>>() {}));
+				Map<String,Object> map = new ObjectMapper().readValue(sourceAsString, new TypeReference<Map<String, Object>>() {});
+ 				for(Entry<String,Object> entry : map.entrySet()){
+ 					measurement.getValues().put(entry.getKey(), entry.getValue());
+				}
 				measurements.add(measurement);
 			} catch (IOException e) {
 				e.printStackTrace();

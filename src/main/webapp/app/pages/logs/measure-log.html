@@ -8,7 +8,7 @@
 		<li><a ui-sref="home">Home</a></li>
 		<li><a ui-sref="measure-log">Measure Logs</a></li>
 	</ol>
-	<div class="col-md-6">
+	<div class="col-md-7">
 		<div ng-repeat="mlog in vm.logs">
 			<div ng-if="mlog.success">
 				<div class="alert alert-success" role="alert"
@@ -28,7 +28,7 @@
 			</div>
 		</div>
 	</div>
-	<div class="col-md-6" ng-show="vm.kibanaframe != null">
+	<div class="col-md-5" ng-show="vm.kibanaframe != null">
 		
 	<div ng-bind-html="vm.kibanaframe | to_trusted"></div>
 	</div>

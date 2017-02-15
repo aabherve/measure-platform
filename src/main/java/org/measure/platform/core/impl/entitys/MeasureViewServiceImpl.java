@@ -80,7 +80,7 @@ public class MeasureViewServiceImpl implements MeasureViewService{
 			String measure = measureView.getMeasureinstance().getInstanceName().replaceAll(" ", "+");
 			
 			String width = "300";
-			String height = "300";
+			String height = "200";
 			String font = "50";
 			if(measureView.getSize().equals("Small")){
 				font = "20";

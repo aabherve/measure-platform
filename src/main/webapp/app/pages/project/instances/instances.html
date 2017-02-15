@@ -6,16 +6,19 @@
 			<h2>Measures Instances</h2>
 		</div>
 
-		<div style="float: right; margin-top: -80px">
-			<button class="btn btn-link btn-lg" ui-sref="projectinstances.new">
-				<span class="glyphicon glyphicon-plus" aria-hiden="true"></span>
-			</button>
-		</div>
+
 
 		<ol class="breadcrumb">
 			<li><a ui-sref="home">Home</a></li>
 			<li><a ui-sref="projectinstances">Measures Instances</a></li>
 		</ol>
+
+
+		<div style="float: right; margin-top: 0px">
+			<button class="btn btn-link" ui-sref="projectinstances.new">
+				<span class="glyphicon glyphicon-plus" aria-hiden="true"></span>
+			</button>
+		</div>
 
 		<div class="input-group"
 			style="width: 300px; float: right; margin-bottom: 20px;">
@@ -26,6 +29,9 @@
 				ng-options="project as project.projectName for project in vm.projects">
 			</select>
 		</div>
+
+
+
 
 
 		<table class="jh-table table table-striped">
