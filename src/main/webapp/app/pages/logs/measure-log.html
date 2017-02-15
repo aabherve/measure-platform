@@ -8,7 +8,7 @@
 		<li><a ui-sref="home">Home</a></li>
 		<li><a ui-sref="measure-log">Measure Logs</a></li>
 	</ol>
-	<div class="col-md-7">
+	<div class="col-md-6">
 		<div ng-repeat="mlog in vm.logs">
 			<div ng-if="mlog.success">
 				<div class="alert alert-success" role="alert"
@@ -28,8 +28,7 @@
 			</div>
 		</div>
 	</div>
-	<div class="col-md-5">
-		<iframe ng-show="vm.kibanaadress != null"
-			src="http://{{vm.kibanaadress}}/app/kibana#/visualize/create?embed=true&type=area&indexPattern=measure&_g=(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-60d,mode:quick,to:now))&_a=(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(vis:(colors:(Count:%237EB26D),legendOpen:!f)),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(customInterval:'2h',customLabel:'Measure+Collected+Daly',extended_bounds:(),field:postDate,interval:d,min_doc_count:1),schema:segment,type:date_histogram)),listeners:(),params:(addLegend:!t,addTimeMarker:!t,addTooltip:!t,defaultYExtents:!f,interpolate:linear,legendPosition:right,mode:stacked,scale:linear,setYExtents:!f,shareYAxis:!t,smoothLines:!t,times:!(),yAxis:()),title:'New+Visualization',type:area))"
-			height="400" width="700" style="border: none;"></iframe>
+	<div class="col-md-6" ng-show="vm.kibanaframe != null">
+		
+	<div ng-bind-html="vm.kibanaframe | to_trusted"></div>
 	</div>

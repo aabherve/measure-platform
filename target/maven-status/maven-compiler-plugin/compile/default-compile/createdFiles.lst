@@ -82,6 +82,7 @@ org\measure\platform\framework\config\JHipsterProperties$Metrics$Jmx.class
 org\measure\platform\framework\service\AuditEventService.class
 org\measure\platform\restapi\app\entitys\MeasurePropertyResource.class
 org\measure\platform\core\impl\repository\UserRepository.class
+org\measure\platform\restapi\app\services\dto\PlatformConfiguration.class
 org\measure\platform\framework\config\JHipsterProperties$Http.class
 org\measure\platform\framework\config\JHipsterProperties$Metrics$Spark.class
 org\measure\platform\framework\domain\User.class

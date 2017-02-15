@@ -39,6 +39,7 @@ public class MeasureCatalogueService implements IMeasureCatalogueService {
 	@Override
 	public void storeMeasure(Path measure) {
 		try {
+			System.out.println(measurePath + " " + measurePath);
 			SMMMeasure measureInfos = MeasurePackager.getMeasureDataFromZip(measure);
 			UnzipUtility unzip = new UnzipUtility();
 			Path target = new File(measurePath).toPath().resolve(measureInfos.getName());

@@ -133,17 +133,17 @@ public class MeasureViewServiceImpl implements MeasureViewService{
 			String width = "800";
 			String height = "400";
 			if(measureView.getSize().equals("Small")){
+				width = "300";
+				height = "200";
+			} else if(measureView.getSize().equals("Medium")){
 				width = "400";
 				height = "300";
-			} else if(measureView.getSize().equals("Medium")){
-				width = "800";
-				height = "400";
 			} else if(measureView.getSize().equals("Large")){
-				width = "1200";
-				height = "600";
+				width = "600";
+				height = "400";
 			} else if(measureView.getSize().equals("Very Large")){
-				width = "1800";
-				height = "800";
+				width = "800";
+				height = "600";
 			}
 			
 			String value =   messageSource.getMessage("viewtype.view1", new Object[]{type,refresh,periode,measure,color,interval,height,width,kibanaAdress}, Locale.ENGLISH);    	

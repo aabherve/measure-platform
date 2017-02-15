@@ -13,9 +13,9 @@
 				method : 'GET',
 				isArray : true
 			},'kibanaadress' : {
-				url : 'api/configuration/kibana-adress',
+				url : 'api/platform/configuration',
 				method : 'GET',
-				isArray : true
+				isArray : false
 			}
 		});
 

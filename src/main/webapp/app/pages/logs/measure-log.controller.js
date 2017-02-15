@@ -12,17 +12,21 @@
 
 		vm.logs = [];
 		
-		vm.kibanaadress = null;
+		vm.kibanaframe =null;
 
 		loadAll();
+		
+		loadProperties();
 			
 		function loadAll() {
 			MeasureLogService.alllogs(function(result) {
 				vm.logs = result;
 			});
-			
+		}
+		
+		function loadProperties() {
 			MeasureLogService.kibanaadress(function(result) {
-				vm.kibanaadress = result;
+				vm.kibanaframe =  "<iframe src=\"http://" +result.kibanaAdress + "/app/kibana#/visualize/create?embed=true&type=area&indexPattern=measure&_g=(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-60d,mode:quick,to:now))&_a=(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(vis:(colors:(Count:%237EB26D),legendOpen:!f)),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(customInterval:'2h',customLabel:'Measure+Collected+Daly',extended_bounds:(),field:postDate,interval:d,min_doc_count:1),schema:segment,type:date_histogram)),listeners:(),params:(addLegend:!t,addTimeMarker:!t,addTooltip:!t,defaultYExtents:!f,interpolate:linear,legendPosition:right,mode:stacked,scale:linear,setYExtents:!f,shareYAxis:!t,smoothLines:!t,times:!(),yAxis:()),title:'New+Visualization',type:area))\" height=\"400\" width=\"700\" style=\"border: none;\"></iframe>";
 			});
 		}
 		

@@ -44,14 +44,14 @@
 		</ol>
 
 
-		<div style="display: inline-block; width: 100%;">
+		<div style="display: inline-block; width: 100%;margin-left: 15px;">
 
 			<div ng-repeat="measureview in vm.project.measureview"
-				style="display: inline-block; padding: 10px; text-align: center;">
+				style="display: inline-block; padding: 0px; text-align: center;">
 				<div class="row">
-					<div class="thumbnail" style="margin: 20px; text-align: center;">
+					<div class="thumbnail" style="margin: 0px; text-align: center;">
 						<div ng-bind-html="measureview.viewData | to_trusted"></div>
-						<div class="caption" style)"text-align:center;">
+						<div class="caption" style="text-align: center; padding: 0px;">
 							<h3 style="margin: 0px;">{{measureview.name}}</h3>
 							<p style="margin: 0px;">{{measureview.description}}</p>
 						</div>
@@ -79,8 +79,9 @@
 			</div>
 		</div>
 
-		<h2>Phases</h2>
-
+		<div class="page-header">
+			<h3 style="margin-top:10px">Phases</h3>
+		</div>
 		<div style="float: right; margin-top: -40px">
 			<button class="btn btn-link"
 				ui-sref="appproject.newphase({id:vm.project.id})">

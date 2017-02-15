@@ -6,6 +6,7 @@ import javax.inject.Inject;
 
 import org.measure.platform.smmengine.api.ILoggerService;
 import org.measure.smm.log.MeasureLog;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -25,4 +26,5 @@ public class MeasureLoggerResource {
 	public List<MeasureLog> executeMeasure() {
 		return logger.getMeasureExecutionLogs();
 	}
+
 }

@@ -16,7 +16,7 @@
 		</ol>
 
 		<div ng-repeat="project in vm.projects"
-			style="min-width: 400px; display: inline-block; margin: 10px;">
+			style="min-width: 300px; display: inline-block; margin: 10px;">
 			<div class="panel panel-default">
 				<div class="row">
 
@@ -30,8 +30,8 @@
 
 
 					</div>
-					<div class="col-md-9">
-						<h3>{{project.projectName}}</h3>
+					<div class="col-md-8" style="margin-top :10px;">
+						<h4>{{project.projectName}}</h4>
 					</div>
 					<div class="col-md-1" style="margin-top: -40px;">
 						<button class="btn btn-link btn-lg"
@@ -48,17 +48,17 @@
 						</button>
 					</div>
 				</div>
-				<div class="panel-body" style="padding-top: 0px;">
+				<div class="panel-body" style="padding: 0px;">
 					<div
-						style="min-width: 400px; min-height: 50px; margin-bottom: 0px; text-align: center;">
+						style="min-width: 300px; min-height: 50px; margin-bottom: 0px; text-align: center;">
 						<div ng-repeat="measureview in project.measureview"
-							style="display: inline-block; padding: 10px; text-align: center;">
+							style="display: inline-block; padding: 0px; text-align: center;">
 
 							<div class="row" style="text-align: center;">
 								<div class="thumbnail"
-									style="border: none; margin: 0px; text-align: center;">
+									style="border: none; margin: 20px; text-align: center;">
 									<div ng-bind-html="measureview.viewData | to_trusted"></div>
-									<div class="caption" style="text-align: center;">
+									<div class="caption" style="text-align: center;padding:0px;">
 										<h3 style="margin: 0px;">{{measureview.name}}</h3>
 										<p style="margin: 0px;">{{measureview.description}}</p>
 									</div>
@@ -90,7 +90,7 @@
 					</div>
 				</div>
 
-				<div class="panel-footer">
+				<div class="panel-footer" style="text-align: center;">
 					<a class="btn btn-primary" role="button"
 						ui-sref="appproject({id:project.id})">Open Project</a>
 				</div>
