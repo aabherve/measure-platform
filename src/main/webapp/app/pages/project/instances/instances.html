@@ -58,12 +58,10 @@
 
 					<td style="vertical-align: top;">
 
-						<h3 style="margin-top: 0px;">
-							<span class="label label-default">{{instance.instanceName}}</span>
-						</h3>
+						{{instance.instanceName}}
 
 					</td>
-					<td style="vertical-align: top;"><b>{{instance.measureName}}</b></td>
+					<td style="vertical-align: top;">{{instance.measureName}}</td>
 					<td style="vertical-align: top;">
 						<div ng-repeat="required in instance.ownedReferences">
 							<span class="label label-success"
@@ -82,14 +80,9 @@
 						</dl>
 					</td>
 					<td style="vertical-align: top;">
-						<h4 style="margin-top: 0px;" ng-show="!instance.isRemote">
-							<span class="label label-primary" style="height: 50px;">Measure
-								Platform</span>
-						</h4>
-						<h4 style="margin-top: 0px;" ng-show="instance.isRemote">
-							<span class="label label-warning">{{instance.remoteLabel}}</span>
-							<span class="label label-warning">{{instance.remoteAdress}}</span>
-						</h4>
+						<div ng-show="!instance.isRemote">Measure Platform</div>
+						<div ng-show="instance.isRemote">{{instance.remoteLabel}}
+							{{instance.remoteAdress}}</div>
 					</td>
 
 					<td style="vertical-align: top;">
