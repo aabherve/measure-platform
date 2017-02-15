@@ -209,6 +209,8 @@ public class MeasureExecutionService implements IMeasureExecutionService {
 
 	private List<IMeasurement> executeDerivedMeasure(IDerivedMeasure derivedMeasure, List<MeasureReference> references,
 			MeasureLog log) throws Exception {
+		
+		derivedMeasure.cleanMeasureInput();
 		for (MeasureReference ref : references) {
 			List<IMeasurement> measurements = measurementStorage.getMeasurement(ref.getReferencedInstance().getInstanceName(), ref.getNumberRef(), ref.getFilterExpression());
 			for (IMeasurement measurement : measurements) {
@@ -216,9 +218,11 @@ public class MeasureExecutionService implements IMeasureExecutionService {
 				log.getInputs().add(log.new MeasureTestInput(ref.getRole(), measurement));
 			}
 		}
-
+	
+		List<IMeasurement>  result =derivedMeasure.calculateMeasurement();
+		
 		// Execute Measure
-		return derivedMeasure.calculateMeasurement();
+		return result;
 	}
 
 	private HashMap<String, String> initialiseProperties(MeasureInstance measureData, MeasureLog log) {
