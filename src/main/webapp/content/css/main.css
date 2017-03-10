@@ -70,7 +70,8 @@ Browser Upgrade Prompt
 Logo styles
 ========================================================================== */
 .navbar-brand.logo {
-	padding: 5px 15px;
+	padding: 10px 15px;
+	padding-top :9px;
 }
 
 .navbar-brand.logo .logo-img {

@@ -11,7 +11,7 @@
 		<li><a ui-sref="home">Home</a></li>
 		<li><a ui-sref="measure">Measures</a></li>
 	</ol>
-	
+
 	<div style="float: right; margin-top: 0px">
 		<button class="btn btn-link" ui-sref="measure.upload">
 			<span class="glyphicon glyphicon-import" aria-hiden="true"></span>
@@ -39,10 +39,7 @@
 
 
 				<td style="vertical-align: top;">
-
-					<h3 style="margin-top: 0px;">
-						<span class="label label-default">{{measure.name}}</span>
-					</h3>
+					{{measure.name}}
 				</td>
 				<td style="vertical-align: top;">{{measure.description}}</td>
 				<td style="vertical-align: top;">
@@ -61,7 +58,7 @@
 					<dl class="dl-horizontal"
 						ng-repeat="scopePropertie in measure.scopeProperties"
 						style="margin-bottom: 0px;">
-						<dt style="text-align: left;">{{scopePropertie.name}}</dt>
+						<dt style="text-align: left;font-weight: normal;">{{scopePropertie.name}}</dt>
 						<dd>{{scopePropertie.defaultValue}}</dd>
 					</dl>
 

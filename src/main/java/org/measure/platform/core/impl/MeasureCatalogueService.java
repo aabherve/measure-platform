@@ -39,7 +39,7 @@ public class MeasureCatalogueService implements IMeasureCatalogueService {
 	@Override
 	public void storeMeasure(Path measure) {
 		try {
-			System.out.println(measurePath + " " + measurePath);
+			System.out.println(measure + " " + measurePath);
 			SMMMeasure measureInfos = MeasurePackager.getMeasureDataFromZip(measure);
 			UnzipUtility unzip = new UnzipUtility();
 			Path target = new File(measurePath).toPath().resolve(measureInfos.getName());
@@ -57,9 +57,11 @@ public class MeasureCatalogueService implements IMeasureCatalogueService {
 		try {
 			File repository = new File(measurePath);
 			for (File file : repository.listFiles()) {
-				result.add(MeasurePackager.getMeasureData(file.toPath().resolve(MeasurePackager.MEATADATAFILE)));
+				if(file.toPath().resolve(MeasurePackager.MEATADATAFILE).toFile().exists()){
+					result.add(MeasurePackager.getMeasureData(file.toPath().resolve(MeasurePackager.MEATADATAFILE)));
+				}
 			}
-		} catch (JAXBException | IOException e) {
+		} catch (Exception e) {
 			log.error(e.getLocalizedMessage());
 		}
 		return result;
