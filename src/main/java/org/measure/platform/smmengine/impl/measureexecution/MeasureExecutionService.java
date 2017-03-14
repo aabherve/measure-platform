@@ -17,17 +17,13 @@ import org.measure.platform.core.entity.MeasureInstance;
 import org.measure.platform.core.entity.MeasureProperty;
 import org.measure.platform.core.entity.MeasureReference;
 import org.measure.platform.measurementstorage.api.IMeasurementStorage;
-import org.measure.platform.smmengine.api.ILoggerService;
 import org.measure.platform.smmengine.api.IMeasureExecutionService;
 import org.measure.smm.log.MeasureLog;
 import org.measure.smm.measure.api.IDerivedMeasure;
 import org.measure.smm.measure.api.IDirectMeasure;
 import org.measure.smm.measure.api.IMeasure;
 import org.measure.smm.measure.api.IMeasurement;
-import org.measure.smm.remote.RemoteExecutionResult;
-import org.measure.smm.remote.RemoteMeasureInstanceData;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 
 @Service
 public class MeasureExecutionService implements IMeasureExecutionService {
@@ -58,15 +54,14 @@ public class MeasureExecutionService implements IMeasureExecutionService {
 		try {
 
 			List<IMeasurement> measurements = new ArrayList<>();
-			if (measureData.isIsRemote()) {
-				measurements.addAll(executeRemoteMeasure(measureData, log,true));
-			} else {
+//			if (measureData.isIsRemote()) {
+//				measurements.addAll(executeRemoteMeasure(measureData, log,true));
+//			} else {
 				measurements.addAll(executeLocalMeasure(measureData, measureImpl, log,true));
-			}
+//			}
 
 			for (IMeasurement measurement : measurements) {
-				measurementStorage.putMeasurement(measureData.getInstanceName(), measureData.isManageLastMeasurement(),
-						measurement);
+				measurementStorage.putMeasurement(measureData.getInstanceName(), measureData.isManageLastMeasurement(),measurement);
 			}
 		} catch (Exception e) {
 			log.setExceptionMessage(e.getMessage());
@@ -88,16 +83,15 @@ public class MeasureExecutionService implements IMeasureExecutionService {
 		try {
 
 			List<IMeasurement> measurements = new ArrayList<>();
-			if (measureData.isIsRemote()) {
-				measurements.addAll(executeRemoteMeasure(measureData, log,true));
-			} else {
+//			if (measureData.isIsRemote()) {
+//				measurements.addAll(executeRemoteMeasure(measureData, log,true));
+//			} else {
 				IMeasure measureImpl = measureCatalogue.getMeasureImplementation(measureData.getMeasureName());
 				measurements.addAll(executeLocalMeasure(measureData, measureImpl, log,true));
-			}
+//			}
 
 			for (IMeasurement measurement : measurements) {
-				measurementStorage.putMeasurement(measureData.getInstanceName(), measureData.isManageLastMeasurement(),
-						measurement);
+				measurementStorage.putMeasurement(measureData.getInstanceName(), measureData.isManageLastMeasurement(),measurement);
 			}
 		} catch (Exception e) {
 			log.setExceptionMessage(e.getMessage());
@@ -116,47 +110,16 @@ public class MeasureExecutionService implements IMeasureExecutionService {
 		log.setMeasureInstanceName(measureData.getInstanceName());
 		log.setMeasureName(measureData.getMeasureName());
 
-		if (measureData.isIsRemote()) {
-			executeRemoteMeasure(measureData, log,false);
-		} else {
+//		if (measureData.isIsRemote()) {
+//			executeRemoteMeasure(measureData, log,false);
+//		} else {
 			IMeasure measureImpl = measureCatalogue.getMeasureImplementation(measureData.getMeasureName());
 			executeLocalMeasure(measureData, measureImpl, log,false);
-		}
+//		}
 		return log;
 	}
 
-	private List<IMeasurement> executeRemoteMeasure(MeasureInstance measure, MeasureLog log,boolean storeProp) {
-		RestTemplate restTemplate = new RestTemplate();
-		try {
-
-			String url = "http://" + measure.getRemoteAdress() + "/api/measure-agent/measure-execution";
-
-			RemoteMeasureInstanceData data = new RemoteMeasureInstanceData();
-			data.setInstanceName(measure.getInstanceName());
-			data.setMeasureName(measure.getMeasureName());
-
-			Map<String, String> properties = initialiseProperties(measure, null);
-			data.setProperties(properties);
-
-			RemoteExecutionResult result = restTemplate.postForObject(url, data, RemoteExecutionResult.class);
-
-			if (result != null) {
-				if (storeProp)
-					storeUpdatedProperties(measure,result.getUpdatedProperties());
-				
-				log.setLog(result.getExecutionLog());
-				return log.getMesurement();
-			} else {
-				log.setSuccess(false);
-				log.setExceptionMessage("No Result");
-			}
-		} catch (Exception e) {
-			log.setSuccess(false);
-			log.setExceptionMessage(e.getMessage());
-		}
-
-		return new ArrayList<>();
-	}
+	
 
 	private List<IMeasurement> executeLocalMeasure(MeasureInstance measure, IMeasure measureImpl, MeasureLog log,boolean storeProp) {
 		try {
@@ -215,7 +178,7 @@ public class MeasureExecutionService implements IMeasureExecutionService {
 			List<IMeasurement> measurements = measurementStorage.getMeasurement(ref.getReferencedInstance().getInstanceName(), ref.getNumberRef(), ref.getFilterExpression());
 			for (IMeasurement measurement : measurements) {
 				derivedMeasure.addMeasureInput(ref.getReferencedInstance().getInstanceName(), ref.getRole(),measurement);
-				log.getInputs().add(log.new MeasureTestInput(ref.getRole(), measurement));
+				log.getInputs().add(log.new MeasureLogInput(ref.getRole(), measurement));
 			}
 		}
 	
@@ -231,7 +194,7 @@ public class MeasureExecutionService implements IMeasureExecutionService {
 			properties.put(property.getPropertyName(), property.getPropertyValue());
 			if (log != null) {
 				log.getParameters()
-						.add(log.new MeasureTestParameters(property.getPropertyName(), property.getPropertyValue()));
+						.add(log.new MeasureLogParameters(property.getPropertyName(), property.getPropertyValue()));
 			}
 		}
 		return properties;

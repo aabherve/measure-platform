@@ -4,11 +4,13 @@
 	angular.module('measurePlatformApp').controller(
 			'AppProjectInstancesController', AppProjectInstancesController);
 
-	AppProjectInstancesController.$inject = ['$location', '$scope', 'Principal',
-			'LoginService', '$state','entity', 'Home', 'ProjectInstances' ];
+	AppProjectInstancesController.$inject = [ '$location', '$scope',
+			'Principal', 'LoginService', '$state', 'entity', 'Home',
+			'ProjectInstances', 'MeasureAgentService' ];
 
-	function AppProjectInstancesController($location,$scope, Principal, LoginService,
-			$state,entity ,Home, ProjectInstances) {
+	function AppProjectInstancesController($location, $scope, Principal,
+			LoginService, $state, entity, Home, ProjectInstances,
+			MeasureAgentService) {
 		var vm = this;
 
 		vm.projects = [];
@@ -20,22 +22,33 @@
 			Home.projects(function(result) {
 				vm.projects = result;
 				if (entity.id != null) {
-					for(var i = 0 ; i<vm.projects.length;i ++){
-						if(vm.projects[i].id == entity.id){
+					for (var i = 0; i < vm.projects.length; i++) {
+						if (vm.projects[i].id == entity.id) {
 							vm.project = vm.projects[i];
 						}
-					}					
+					}
 					loadAll(vm.project.id);
-				}else if(vm.projects.length > 0){
+				} else if (vm.projects.length > 0) {
 					vm.project = vm.projects[0];
 				}
 			});
 		}
 
+		vm.agents = [];
+
+		loadAgents();
+
+		function loadAgents() {
+			MeasureAgentService.allAgents(function(result) {
+				vm.agents = result;
+			});
+		}
+
 		$scope.$watch("vm.project", function(newValue, oldValue) {
-			if(newValue != null && newValue.id != null && (oldValue == null || newValue.id != oldValue.id)){
+			if (newValue != null && newValue.id != null
+					&& (oldValue == null || newValue.id != oldValue.id)) {
 				$location.path("/instances/" + newValue.id);
-			}		
+			}
 		});
 
 		vm.measureInstances = [];
@@ -91,6 +104,10 @@
 					loadReference(vm.measureInstances[i].id);
 					loadProperties(vm.measureInstances[i].id);
 					isShedule(vm.measureInstances[i].id);
+					if (vm.measureInstances[i].isRemote == true) {
+						isAgentEnable(vm.measureInstances[i]);
+					}
+
 				}
 			});
 		}
@@ -105,6 +122,15 @@
 					}
 				}
 			});
+		}
+
+		function isAgentEnable(measureInstance) {
+			measureInstance.agentEnable = false;
+			for (var i = 0; i < vm.agents.length; i++) {
+				if (vm.agents[i].agentAdress == measureInstance.remoteAdress) {
+					measureInstance.agentEnable = true;
+				}
+			}
 		}
 
 		function isReferenceShedule(id, reference) {

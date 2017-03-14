@@ -80,9 +80,15 @@
 						</dl>
 					</td>
 					<td style="vertical-align: top;">
-						<div ng-show="!instance.isRemote">Measure Platform</div>
-						<div ng-show="instance.isRemote">{{instance.remoteLabel}}
-							{{instance.remoteAdress}}</div>
+						<div ng-show="!instance.isRemote"><span class="label label-success">Measure Platform</span></div>
+						
+						
+						
+						<div ng-show="instance.isRemote">
+							<span ng-show="instance.agentEnable" class="label label-success">{{instance.remoteLabel}}</span>
+							<span ng-show="!instance.agentEnable" class="label label-danger">{{instance.remoteLabel}}</span>
+						
+						</div>
 					</td>
 
 					<td style="vertical-align: top;">
@@ -96,13 +102,13 @@
 					<td style="vertical-align: top;" class="text-right">
 
 						<div class="btn-group flex-btn-group-container">
-							<button type="submit"
+							<button type="submit" ng-show="!instance.isRemote"
 								ui-sref="projectinstances.test({instanceId:instance.id})"
 								class="btn btn-primary btn-sm">
 								<span class="glyphicon glyphicon-flash"></span> <span
 									class="hidden-xs hidden-sm"></span>
 							</button>
-							<button type="submit"
+							<button type="submit" ng-show="!instance.isRemote"
 								ui-sref="projectinstances.execute({instanceId:instance.id})"
 								class="btn btn-primary btn-sm">
 								<span class="glyphicon glyphicon-play"></span> <span

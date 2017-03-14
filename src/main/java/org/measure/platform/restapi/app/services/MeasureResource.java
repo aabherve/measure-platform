@@ -11,8 +11,8 @@ import java.util.Optional;
 import javax.inject.Inject;
 import javax.xml.bind.DatatypeConverter;
 
+import org.measure.platform.agent.api.IRemoteCatalogueService;
 import org.measure.platform.core.api.IMeasureCatalogueService;
-import org.measure.platform.core.api.IRemoteCatalogueService;
 import org.measure.platform.restapi.framework.rest.util.HeaderUtil;
 import org.measure.smm.measure.model.SMMMeasure;
 import org.springframework.http.HttpStatus;

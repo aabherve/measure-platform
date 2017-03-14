@@ -33,7 +33,6 @@ org\measure\platform\core\api\entitys\MeasureReferenceService.class
 org\measure\platform\restapi\framework\rest\errors\ExceptionTranslator.class
 org\measure\platform\core\impl\MeasureCatalogueService.class
 org\measure\platform\framework\config\JHipsterProperties$Swagger.class
-org\measure\platform\core\api\IRemoteCatalogueService.class
 org\measure\platform\framework\service\mapper\UserMapper.class
 org\measure\platform\framework\domain\util\JSR310PersistenceConverters$LocalDateConverter.class
 org\measure\platform\restapi\app\entitys\PhaseResource.class
@@ -55,6 +54,7 @@ org\measure\platform\core\impl\repository\ProjectRepository.class
 org\measure\platform\restapi\framework\rest\vm\ManagedUserVM.class
 org\measure\platform\framework\security\Http401UnauthorizedEntryPoint.class
 org\measure\platform\framework\aop\logging\LoggingAspect.class
+org\measure\platform\agent\impl\data\RemoteAgent.class
 org\measure\platform\framework\domain\util\JSR310DateConverters$DateToLocalDateConverter.class
 org\measure\platform\restapi\framework\rest\errors\ParameterizedErrorVM.class
 org\measure\platform\framework\async\ExceptionHandlingAsyncTaskExecutor.class
@@ -77,7 +77,6 @@ org\measure\platform\framework\config\LoggingConfiguration.class
 org\measure\platform\ApplicationWebXml.class
 org\measure\platform\framework\domain\util\JSR310PersistenceConverters$ZonedDateTimeConverter.class
 org\measure\platform\measurementstorage\impl\ElasticMeasurementStorage.class
-org\measure\platform\restapi\app\services\RemoteRegistrationResource.class
 org\measure\platform\framework\config\JHipsterProperties$Metrics$Jmx.class
 org\measure\platform\framework\service\AuditEventService.class
 org\measure\platform\restapi\app\entitys\MeasurePropertyResource.class
@@ -88,19 +87,23 @@ org\measure\platform\framework\config\JHipsterProperties$Metrics$Spark.class
 org\measure\platform\framework\domain\User.class
 META-INF\spring-configuration-metadata.json
 org\measure\platform\framework\domain\util\JSR310DateConverters$LocalDateToDateConverter.class
+org\measure\platform\agent\impl\AgentManager$1.class
 org\measure\platform\framework\config\JHipsterProperties$Security$RememberMe.class
 org\measure\platform\framework\config\JHipsterProperties.class
 org\measure\platform\framework\config\LoggingConfiguration$LogbackLoggerContextListener.class
 org\measure\platform\framework\security\AjaxAuthenticationFailureHandler.class
+org\measure\platform\agent\impl\AgentCatalogueService.class
+org\measure\platform\smmengine\api\IRemoteMeasureExecutionService.class
+org\measure\platform\agent\api\IRemoteCatalogueService.class
 org\measure\platform\restapi\framework\rest\LogsResource.class
 org\measure\platform\core\impl\repository\MeasurePropertyRepository.class
 org\measure\platform\core\entity\MeasureInstance.class
 org\measure\platform\measurementstorage\impl\ElasticMeasurementStorage$1.class
+org\measure\platform\restapi\app\services\RemoteMeasureResource.class
 org\measure\platform\framework\config\WebConfigurer.class
 org\measure\platform\restapi\framework\rest\vm\LoggerVM.class
 org\measure\platform\smmengine\impl\logger\LoggerService.class
 org\measure\platform\core\impl\entitys\PhaseServiceImpl.class
-org\measure\platform\core\impl\RemoteCatalogueService.class
 org\measure\platform\measurementstorage\impl\ElasticMeasurementStorage$2.class
 org\measure\platform\framework\config\LoggingAspectConfiguration.class
 org\measure\platform\framework\security\UserNotActivatedException.class
@@ -123,6 +126,7 @@ org\measure\platform\framework\config\JHipsterProperties$Metrics$Logs.class
 org\measure\platform\core\api\entitys\MeasureInstanceService.class
 org\measure\platform\framework\domain\util\JSR310PersistenceConverters$LocalDateTimeConverter.class
 org\measure\platform\framework\domain\util\JSR310DateConverters.class
+org\measure\platform\smmengine\impl\measureexecution\RemoteMeasureExecutionService.class
 org\measure\platform\core\impl\entitys\DashboardServiceImpl.class
 org\measure\platform\restapi\app\services\dto\MeasureAgent.class
 org\measure\platform\framework\config\CacheConfiguration.class
@@ -138,9 +142,11 @@ org\measure\platform\measurementstorage\api\IMeasurementLog.class
 org\measure\platform\restapi\framework\rest\ProfileInfoResource.class
 org\measure\platform\framework\security\AjaxLogoutSuccessHandler.class
 org\measure\platform\smmengine\impl\sheduler\SchedulingService$1.class
+org\measure\platform\agent\impl\AgentManager.class
 org\measure\platform\framework\config\apidoc\SwaggerConfiguration.class
 org\measure\platform\smmengine\api\ILoggerService.class
 org\measure\platform\framework\config\audit\AuditEventConverter.class
+org\measure\platform\agent\api\IAgentManager.class
 org\measure\platform\framework\config\Constants.class
 org\measure\platform\core\entity\MeasureReference.class
 org\measure\platform\framework\domain\util\FixedH2Dialect.class
@@ -150,7 +156,6 @@ org\measure\platform\framework\config\JHipsterProperties$Security.class
 org\measure\platform\framework\domain\util\JSR310DateConverters$DateToZonedDateTimeConverter.class
 org\measure\platform\core\entity\MeasureView.class
 org\measure\platform\restapi\app\entitys\MeasureInstanceResource.class
-org\measure\platform\restapi\app\services\RemoteRegistrationResource$1.class
 org\measure\platform\framework\config\JHipsterProperties$Ribbon.class
 org\measure\platform\framework\service\dto\UserDTO.class
 org\measure\platform\framework\config\SecurityConfiguration.class

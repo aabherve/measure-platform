@@ -39,7 +39,6 @@ public class MeasureCatalogueService implements IMeasureCatalogueService {
 	@Override
 	public void storeMeasure(Path measure) {
 		try {
-			System.out.println(measure + " " + measurePath);
 			SMMMeasure measureInfos = MeasurePackager.getMeasureDataFromZip(measure);
 			UnzipUtility unzip = new UnzipUtility();
 			Path target = new File(measurePath).toPath().resolve(measureInfos.getName());
@@ -151,10 +150,6 @@ public class MeasureCatalogueService implements IMeasureCatalogueService {
 		return jars;
 	}
 
-	public static void main(String[] args) {
-		// TODO Auto-generated method stub
-
-	}
 
 	@Override
 	public SMMMeasure getMeasure(String measureId) {
