@@ -2,6 +2,7 @@ package org.measure.platform.measurementstorage.impl;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -35,10 +36,12 @@ public class ElasticMeasurementStorage implements IMeasurementStorage {
 
 	@Override
 	public void putMeasurement(String measureInstance, Boolean manageLast, IMeasurement measurement) {
-		log.debug("putMeasurement[" + measureInstance + "]: " + measurement.getValues());
+				
 		TransportClient client = connection.getClient();
 		client.prepareIndex("measure", measureInstance).setSource(measurement.getValues()).get();
-		client.prepareIndex("measure", measureInstance + "-last", "last").setSource(measurement.getValues()).get();			
+		client.prepareIndex("measure", measureInstance + "-last", "last").setSource(measurement.getValues()).get();		
+		
+		log.debug("putMeasurement[" + measureInstance + "]: " + measurement.getValues() + " (" +new Date()+")");
 	}
 
 	@Override

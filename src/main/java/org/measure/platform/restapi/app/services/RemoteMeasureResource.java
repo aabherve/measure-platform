@@ -13,8 +13,6 @@ import org.measure.platform.smmengine.api.IShedulingService;
 import org.measure.smm.log.MeasureLog;
 import org.measure.smm.measure.model.SMMMeasure;
 import org.measure.smm.remote.RemoteMeasureInstanceList;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
